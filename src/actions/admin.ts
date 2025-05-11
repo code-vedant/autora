@@ -1,8 +1,8 @@
-
 "use server";
 
 import { serializeCarData } from "@/lib/helpers";
 import { db } from "@/lib/prisma";
+import { Car, TestDriveBooking } from "@/lib/types";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 
@@ -22,9 +22,6 @@ export async function getAdmin() {
   return { authorized: true, user };
 }
 
-/**
- * Get all test drives for admin with filters
- */
 export async function getAdminTestDrives({ search = "", status = "" }) {
   try {
     const { userId } = await auth();
@@ -40,20 +37,32 @@ export async function getAdminTestDrives({ search = "", status = "" }) {
     }
 
     // Build where conditions
-    let where = {};
-
+    let where: {
+      status: string;
+      OR?: Array<{
+        car?: {
+          OR: Array<{ brand?: { contains: string; mode: string }; model?: { contains: string; mode: string } }>;
+        };
+        user?: {
+          OR: Array<{ name?: { contains: string; mode: string }; email?: { contains: string; mode: string } }>;
+        };
+      }>;
+    } = {
+      status: "", // Default empty status filter
+    };
+    
     // Add status filter
     if (status) {
       where.status = status;
     }
-
+    
     // Add search filter
     if (search) {
       where.OR = [
         {
           car: {
             OR: [
-              { make: { contains: search, mode: "insensitive" } },
+              { brand: { contains: search, mode: "insensitive" } },
               { model: { contains: search, mode: "insensitive" } },
             ],
           },
@@ -68,6 +77,7 @@ export async function getAdminTestDrives({ search = "", status = "" }) {
         },
       ];
     }
+    
 
     // Get bookings
     const bookings = await db.testDriveBooking.findMany({
@@ -87,8 +97,28 @@ export async function getAdminTestDrives({ search = "", status = "" }) {
       orderBy: [{ bookingDate: "desc" }, { startTime: "asc" }],
     });
 
+    type bookingType = {
+      id: string;
+      carId: string;
+      car: Car;
+      userId: string;
+      user: {
+        id: string;
+        name: string;
+        email: string;
+        imageUrl: string;
+        phone: string;
+      };
+      bookingDate: Date;
+      startTime: Date;
+      endTime: Date;
+      status: string;
+      notes?: string | null;
+      createdAt: Date;
+      updatedAt: Date;
+    };
     // Format the bookings
-    const formattedBookings = bookings.map((booking) => ({
+    const formattedBookings = bookings.map((booking: bookingType) => ({
       id: booking.id,
       carId: booking.carId,
       car: serializeCarData(booking.car),
@@ -111,7 +141,7 @@ export async function getAdminTestDrives({ search = "", status = "" }) {
     console.error("Error fetching test drives:", error);
     return {
       success: false,
-      error: error.message,
+      error: error,
     };
   }
 }
@@ -119,7 +149,13 @@ export async function getAdminTestDrives({ search = "", status = "" }) {
 /**
  * Update test drive status
  */
-export async function updateTestDriveStatus(bookingId, newStatus) {
+export async function updateTestDriveStatus({
+  bookingId,
+  newStatus,
+}: {
+  bookingId: string;
+  newStatus: string;
+}) {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
@@ -172,7 +208,7 @@ export async function updateTestDriveStatus(bookingId, newStatus) {
       message: "Test drive status updated successfully",
     };
   } catch (error) {
-    throw new Error("Error updating test drive status:" + error.message);
+    throw new Error("Error updating test drive status:");
   }
 }
 
@@ -217,39 +253,43 @@ export async function getDashboardData() {
     // Calculate car statistics
     const totalCars = cars.length;
     const availableCars = cars.filter(
-      (car) => car.status === "AVAILABLE"
+      (car: TestDriveBooking) => car.status === "AVAILABLE"
     ).length;
-    const soldCars = cars.filter((car) => car.status === "SOLD").length;
+    const soldCars = cars.filter(
+      (car: TestDriveBooking) => car.status === "SOLD"
+    ).length;
     const unavailableCars = cars.filter(
-      (car) => car.status === "UNAVAILABLE"
+      (car: TestDriveBooking) => car.status === "UNAVAILABLE"
     ).length;
-    const featuredCars = cars.filter((car) => car.featured === true).length;
+    const featuredCars = cars.filter(
+      (car: Car) => car.featured === true
+    ).length;
 
     // Calculate test drive statistics
     const totalTestDrives = testDrives.length;
     const pendingTestDrives = testDrives.filter(
-      (td) => td.status === "PENDING"
+      (td: TestDriveBooking) => td.status === "PENDING"
     ).length;
     const confirmedTestDrives = testDrives.filter(
-      (td) => td.status === "CONFIRMED"
+      (td: TestDriveBooking) => td.status === "CONFIRMED"
     ).length;
     const completedTestDrives = testDrives.filter(
-      (td) => td.status === "COMPLETED"
+      (td: TestDriveBooking) => td.status === "COMPLETED"
     ).length;
     const cancelledTestDrives = testDrives.filter(
-      (td) => td.status === "CANCELLED"
+      (td: TestDriveBooking) => td.status === "CANCELLED"
     ).length;
     const noShowTestDrives = testDrives.filter(
-      (td) => td.status === "NO_SHOW"
+      (td: TestDriveBooking) => td.status === "NO_SHOW"
     ).length;
 
     // Calculate test drive conversion rate
     const completedTestDriveCarIds = testDrives
-      .filter((td) => td.status === "COMPLETED")
-      .map((td) => td.carId);
+      .filter((td: TestDriveBooking) => td.status === "COMPLETED")
+      .map((td: TestDriveBooking) => td.carId);
 
     const soldCarsAfterTestDrive = cars.filter(
-      (car) =>
+      (car: TestDriveBooking) =>
         car.status === "SOLD" && completedTestDriveCarIds.includes(car.id)
     ).length;
 
@@ -280,10 +320,10 @@ export async function getDashboardData() {
       },
     };
   } catch (error) {
-    console.error("Error fetching dashboard data:", error.message);
+    console.error("Error fetching dashboard data:");
     return {
       success: false,
-      error: error.message,
+      error: error,
     };
   }
 }

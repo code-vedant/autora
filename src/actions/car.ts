@@ -11,7 +11,7 @@ import { serializeCarData } from "@/lib/helpers";
 
 // -------------------- Types --------------------
 interface CarDetails {
-  make: string;
+  brand: string;
   model: string;
   year: number;
   color: string;
@@ -25,7 +25,7 @@ interface CarDetails {
 }
 
 interface CarInput {
-  make: string;
+  brand: string;
   model: string;
   year: number;
   price: string;
@@ -76,7 +76,7 @@ export async function processCarImageWithAI(file: Blob): Promise<{ success: bool
       ...
       Format your response as a clean JSON object with these fields:
       {
-        "make": "",
+        "brand": "",
         "model": "",
         ...
       }
@@ -90,7 +90,7 @@ export async function processCarImageWithAI(file: Blob): Promise<{ success: bool
       const carDetails: CarDetails = JSON.parse(text);
 
       const requiredFields = [
-        "make", "model", "year", "color", "bodyType", "price", "mileage",
+        "brand", "model", "year", "color", "bodyType", "price", "mileage",
         "fuelType", "transmission", "description", "confidence"
       ];
 
@@ -125,7 +125,7 @@ export async function addCar({
 
     const carId = uuidv4();
     const folderPath = `cars/${carId}`;
-    const supabase = createClient(await cookies());
+    const supabase = createClient(cookies());
 
     const imageUrls: string[] = [];
 
@@ -178,7 +178,7 @@ export async function getCars(
     const where: any = {};
     if (search) {
       where.OR = [
-        { make: { contains: search, mode: "insensitive" } },
+        { brand: { contains: search, mode: "insensitive" } },
         { model: { contains: search, mode: "insensitive" } },
         { color: { contains: search, mode: "insensitive" } },
       ];
@@ -211,7 +211,7 @@ export async function deleteCar(
     try {
       const supabase = createClient(cookies());
       const filePaths = car.images
-        .map((url) => {
+        .map((url : string) => {
           const match = new URL(url).pathname.match(/\/car-images\/(.*)/);
           return match?.[1] ?? null;
         })

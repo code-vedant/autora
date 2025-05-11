@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client-ts"
 }
 
 datasource db {
@@ -29,7 +29,7 @@ enum UserRole {
 
 model Car {
   id                String             @id @default(uuid())
-  make              String
+  brand              String
   model             String
   year              Int
   price             Decimal            @db.Decimal(10, 2)
@@ -48,7 +48,7 @@ model Car {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
 
-  @@index([make, model])
+  @@index([brand, model])
   @@index([bodyType])
   @@index([price])
   @@index([year])
