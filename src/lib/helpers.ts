@@ -1,13 +1,22 @@
 import { Car } from "./types";
 
-export const formatCurrency = (amount: number) => {
+export const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "INR",
   }).format(amount);
 };
 
-export const serializeCarData = (car: Car, wishlisted = false) => {
+interface SerializedCar {
+  [key: string]: any;
+  price: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+
+
+export const serializeCarData = (car: any , wishlisted: boolean) => {
   return {
     ...car,
     price: car.price ? parseFloat(car.price.toString()) : 0,

@@ -1,12 +1,14 @@
 "use server";
 
+import { Prisma } from "@/generated/client";
 import { serializeCarData } from "@/lib/helpers";
 import { db } from "@/lib/prisma";
 import { Car, UserSavedCar, WorkingHour } from "@/lib/types";
 import { auth } from "@clerk/nextjs/server";
+import { DealershipInfo } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
-type CarFiltersResult = {
+interface CarFiltersResult {
   success: true;
   data: {
     brands: string[];
@@ -18,27 +20,31 @@ type CarFiltersResult = {
       max: number;
     };
   };
-};
-type GetCarsParams = {
-  search?: string;
-  brand?: string;
-  bodyType?: string;
-  fuelType?: string;
-  transmission?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  sortBy?: "newest" | "priceAsc" | "priceDesc";
-  page?: number;
-  limit?: number;
-  success: boolean;
-  data: Car[];
+}
+
+interface GetCarsParamsResult {
+  success: true;
+  data: ReturnType<typeof serializeCarData>[];
   pagination: {
     total: number;
     page: number;
     limit: number;
     pages: number;
   };
-};
+}
+
+interface GetCarsParams {
+  search?: string;
+  brand?: string;
+  bodyType?: string;
+  fuelType?: string;
+  transmission?: string;
+  minPrice?: string | number;
+  maxPrice?: string | number;
+  sortBy?: "newest" | "priceAsc" | "priceDesc";
+  page?: number;
+  limit?: number;
+}
 
 export async function getCarFilters(): Promise<CarFiltersResult> {
   try {
@@ -84,10 +90,10 @@ export async function getCarFilters(): Promise<CarFiltersResult> {
     return {
       success: true,
       data: {
-        brands: brands.map((item: Car) => item.brand),
-        bodyTypes: bodyTypes.map((item: Car) => item.bodyType),
-        fuelTypes: fuelTypes.map((item: Car) => item.fuelType),
-        transmissions: transmissions.map((item: Car) => item.transmission),
+        brands: brands.map((item) => item.brand),
+        bodyTypes: bodyTypes.map((item) => item.bodyType),
+        fuelTypes: fuelTypes.map((item) => item.fuelType),
+        transmissions: transmissions.map((item) => item.transmission),
         priceRange: {
           min: priceAggregations._min.price
             ? parseFloat(priceAggregations._min.price.toString())
@@ -98,8 +104,9 @@ export async function getCarFilters(): Promise<CarFiltersResult> {
         },
       },
     };
-  } catch (error) {
-    throw new Error("Error fetching car filters:");
+  } catch (error: any) {
+    console.error("Error fetching car filters:", error);
+    throw new Error("Error fetching car filters:" + error.message);
   }
 }
 
@@ -114,7 +121,7 @@ export async function getCars({
   sortBy = "newest", // Options: newest, priceAsc, priceDesc
   page = 1,
   limit = 6,
-}): Promise<GetCarsParams> {
+}: GetCarsParams): Promise<GetCarsParamsResult> {
   try {
     const { userId } = await auth();
     let dbUser = null;
@@ -126,19 +133,7 @@ export async function getCars({
     }
 
     // Build where conditions
-    let where: {
-      status: string;
-      OR?: {
-        brand?: { contains: string; mode: string };
-        model?: { contains: string; mode: string };
-        description?: { contains: string; mode: string };
-      }[];
-      brand?: { equals: string; mode: string };
-      bodyType?: { equals: string; mode: string };
-      fuelType?: { equals: string; mode: string };
-      transmission?: { equals: string; mode: string };
-      price?: { gte?: number; lte?: number };
-    } = {
+    let where: Prisma.CarWhereInput= {
       status: "AVAILABLE",
     };
 
@@ -158,11 +153,11 @@ export async function getCars({
 
     // Add price range
     where.price = {
-      gte: parseFloat(minPrice) || 0,
+      gte: parseFloat(minPrice as string) || 0,
     };
 
     if (maxPrice && maxPrice) {
-      where.price.lte = parseFloat(maxPrice);
+      where.price.lte = parseFloat(maxPrice as string);
     }
 
     // Calculate pagination
@@ -195,18 +190,18 @@ export async function getCars({
     });
 
     // If we have a user, check which cars are wishlisted
-    let wishlisted = new Set();
+    let wishlisted = new Set<string>();
     if (dbUser) {
       const savedCars = await db.userSavedCar.findMany({
         where: { userId: dbUser.id },
         select: { carId: true },
       });
 
-      wishlisted = new Set(savedCars.map((saved: UserSavedCar) => saved.carId));
+      wishlisted = new Set(savedCars.map((saved) => saved.carId));
     }
 
     // Serialize and check wishlist status
-    const serializedCars = cars.map((car: Car) =>
+    const serializedCars = cars.map((car) =>
       serializeCarData(car, wishlisted.has(car.id))
     );
 
@@ -220,15 +215,23 @@ export async function getCars({
         pages: Math.ceil(totalCars / limit),
       },
     };
-  } catch (error) {
-    throw new Error("Error fetching cars");
+  } catch (error: any) {
+    console.error("Error fetching cars:", error);
+    throw new Error("Error fetching cars: " + error.message);
   }
+}
+
+interface ToggleSavedCarResult {
+  success: boolean;
+  saved?: boolean;
+  message?: string;
+  error?: string;
 }
 
 /**
  * Toggle car in user's wishlist
  */
-export async function toggleSavedCar(carId: string) {
+export async function toggleSavedCar(carId: string): Promise<ToggleSavedCarResult> {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
@@ -294,15 +297,44 @@ export async function toggleSavedCar(carId: string) {
       saved: true,
       message: "Car added to favorites",
     };
-  } catch (error) {
-    throw new Error("Error toggling saved car:");
+  } catch (error: any) {
+    console.error("Error toggling saved car:", error);
+    throw new Error("Error toggling saved car: " + error.message);
   }
 }
+
+interface CarDetailsResultSuccess {
+  success: true;
+  data: ReturnType<typeof serializeCarData> & {
+    testDriveInfo: {
+      userTestDrive: {
+        id: string;
+        status: string;
+        bookingDate: string;
+      } | null;
+      dealership: (DealershipInfo & {
+        createdAt: string;
+        updatedAt: string;
+        workingHours: (WorkingHour & {
+          createdAt: string;
+          updatedAt: string;
+        })[];
+      }) | null;
+    };
+  };
+}
+
+interface CarDetailsResultFailure {
+  success: false;
+  error: string;
+}
+
+type CarDetailsResult = CarDetailsResultSuccess | CarDetailsResultFailure;
 
 /**
  * Get car details by ID
  */
-export async function getCarById(carId: string) {
+export async function getCarById(carId: string): Promise<CarDetailsResult> {
   try {
     // Get current user if authenticated
     const { userId } = await auth();
@@ -345,7 +377,7 @@ export async function getCarById(carId: string) {
     const existingTestDrive = await db.testDriveBooking.findFirst({
       where: {
         carId,
-        userId: dbUser.id,
+        userId: dbUser?.id,
         status: { in: ["PENDING", "CONFIRMED", "COMPLETED"] },
       },
       orderBy: {
@@ -381,7 +413,7 @@ export async function getCarById(carId: string) {
                 ...dealership,
                 createdAt: dealership.createdAt.toISOString(),
                 updatedAt: dealership.updatedAt.toISOString(),
-                workingHours: dealership.workingHours.map((hour : WorkingHour) => ({
+                workingHours: dealership.workingHours.map((hour) => ({
                   ...hour,
                   createdAt: hour.createdAt.toISOString(),
                   updatedAt: hour.updatedAt.toISOString(),
@@ -391,16 +423,31 @@ export async function getCarById(carId: string) {
         },
       },
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching car details:", error);
-    throw new Error("Error fetching car details");
+    return {
+      success: false,
+      error: "Error fetching car details: " + error.message,
+    };
   }
 }
+
+interface GetSavedCarsResultSuccess {
+  success: true;
+  data: ReturnType<typeof serializeCarData>[];
+}
+
+interface GetSavedCarsResultFailure {
+  success: false;
+  error: string;
+}
+
+type GetSavedCarsResult = GetSavedCarsResultSuccess | GetSavedCarsResultFailure;
 
 /**
  * Get user's saved cars
  */
-export async function getSavedCars() {
+export async function getSavedCars(): Promise<GetSavedCarsResult> {
   try {
     const { userId } = await auth();
     if (!userId) {
@@ -432,7 +479,7 @@ export async function getSavedCars() {
     });
 
     // Extract and format car data
-    const cars = savedCars.map((saved: any) => serializeCarData(saved.car));
+    const cars = savedCars.map((saved) => serializeCarData(saved.car,true));
 
     return {
       success: true,

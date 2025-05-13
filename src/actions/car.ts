@@ -8,6 +8,8 @@ import { db } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase";
 import { auth } from "@clerk/nextjs/server";
 import { serializeCarData } from "@/lib/helpers";
+import { Car } from "@/lib/types";
+import { CarStatus } from "@/generated/client/enums";
 
 // -------------------- Types --------------------
 interface CarDetails {
@@ -29,14 +31,14 @@ interface CarInput {
   model: string;
   year: number;
   price: string;
-  mileage: string;
+  mileage: number;
   color: string;
   fuelType: string;
   transmission: string;
   bodyType: string;
   seats?: number;
   description: string;
-  status: string;
+  status: CarStatus;
   featured: boolean;
 }
 
@@ -173,7 +175,7 @@ export async function addCar({
 // -------------------- Get Cars --------------------
 export async function getCars(
   search = ""
-): Promise<{ success: boolean; data?: any[]; error?: string }> {
+): Promise<{ success: boolean; data?: Car[]; error?: string }> {
   try {
     const where: any = {};
     if (search) {
@@ -189,7 +191,7 @@ export async function getCars(
       orderBy: { createdAt: "desc" },
     });
 
-    return { success: true, data: cars.map(serializeCarData) };
+    return { success: true, data: cars.map((car) => serializeCarData(car, false)) };
   } catch (error: any) {
     return { success: false, error: error.message };
   }

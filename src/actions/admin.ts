@@ -37,7 +37,7 @@ export async function getAdminTestDrives({ search = "", status = "" }) {
     }
 
     // Build where conditions
-    let where: {
+    let where : {
       status: string;
       OR?: Array<{
         car?: {
@@ -117,11 +117,12 @@ export async function getAdminTestDrives({ search = "", status = "" }) {
       createdAt: Date;
       updatedAt: Date;
     };
+
     // Format the bookings
-    const formattedBookings = bookings.map((booking: bookingType) => ({
+    const formattedBookings = bookings.map((booking) => ({
       id: booking.id,
       carId: booking.carId,
-      car: serializeCarData(booking.car),
+      car: serializeCarData(booking.car,false),
       userId: booking.userId,
       user: booking.user,
       bookingDate: booking.bookingDate.toISOString(),
