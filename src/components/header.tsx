@@ -16,7 +16,7 @@ interface HeaderProps {
 
  const Header: React.FC<HeaderProps> = ({ isAdmin = false }) => {
   return (
-    <div className="fixed bg-white/80 drop-shadow-md h-fit w-full py-1 px-4 shadow-md">
+    <div className="fixed bg-white/80 drop-shadow-md h-12 w-full py-1 px-4 shadow-md">
       <nav className=" flex items-center justify-between ">
         <Link
           href={isAdmin ? "/admin" : "/"}
@@ -29,7 +29,7 @@ interface HeaderProps {
             height={100}
             className="w-fit h-8"
           />
-          <h1 className="text-2xl">Vehqls</h1>
+          <h1 className="text-2xl">Autora</h1>
           {isAdmin && <span className="text-xs font-extralight">Admin</span>}
         </Link>
         <div className="flex items-center gap-2">

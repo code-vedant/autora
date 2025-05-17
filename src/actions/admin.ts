@@ -110,8 +110,8 @@ export async function getAdminTestDrives({ search = "", status = "" }) {
         phone: string;
       };
       bookingDate: Date;
-      startTime: Date;
-      endTime: Date;
+      startTime: string;
+      endTime: string;
       status: string;
       notes?: string | null;
       createdAt: Date;
@@ -119,19 +119,19 @@ export async function getAdminTestDrives({ search = "", status = "" }) {
     };
 
     // Format the bookings
-    const formattedBookings = bookings.map((booking) => ({
+    const formattedBookings = bookings.map((booking) : bookingType => ({
       id: booking.id,
       carId: booking.carId,
       car: serializeCarData(booking.car,false),
       userId: booking.userId,
-      user: booking.user,
-      bookingDate: booking.bookingDate.toISOString(),
+      user: {id: booking.user.id, name: booking.user.name, email: booking.user.email, imageUrl: booking.user.imageUrl, phone: booking.user.phone},
+      bookingDate: booking.bookingDate,
       startTime: booking.startTime,
       endTime: booking.endTime,
       status: booking.status,
       notes: booking.notes,
-      createdAt: booking.createdAt.toISOString(),
-      updatedAt: booking.updatedAt.toISOString(),
+      createdAt: booking.createdAt,
+      updatedAt: booking.updatedAt
     }));
 
     return {
@@ -254,43 +254,43 @@ export async function getDashboardData() {
     // Calculate car statistics
     const totalCars = cars.length;
     const availableCars = cars.filter(
-      (car: TestDriveBooking) => car.status === "AVAILABLE"
+      (car) => car.status === "AVAILABLE"
     ).length;
     const soldCars = cars.filter(
-      (car: TestDriveBooking) => car.status === "SOLD"
+      (car) => car.status === "SOLD"
     ).length;
     const unavailableCars = cars.filter(
-      (car: TestDriveBooking) => car.status === "UNAVAILABLE"
+      (car) => car.status === "UNAVAILABLE"
     ).length;
     const featuredCars = cars.filter(
-      (car: Car) => car.featured === true
+      (car) => car.featured === true
     ).length;
 
     // Calculate test drive statistics
     const totalTestDrives = testDrives.length;
     const pendingTestDrives = testDrives.filter(
-      (td: TestDriveBooking) => td.status === "PENDING"
+      (td) => td.status === "PENDING"
     ).length;
     const confirmedTestDrives = testDrives.filter(
-      (td: TestDriveBooking) => td.status === "CONFIRMED"
+      (td) => td.status === "CONFIRMED"
     ).length;
     const completedTestDrives = testDrives.filter(
-      (td: TestDriveBooking) => td.status === "COMPLETED"
+      (td) => td.status === "COMPLETED"
     ).length;
     const cancelledTestDrives = testDrives.filter(
-      (td: TestDriveBooking) => td.status === "CANCELLED"
+      (td) => td.status === "CANCELLED"
     ).length;
     const noShowTestDrives = testDrives.filter(
-      (td: TestDriveBooking) => td.status === "NO_SHOW"
+      (td) => td.status === "NO_SHOW"
     ).length;
 
     // Calculate test drive conversion rate
     const completedTestDriveCarIds = testDrives
-      .filter((td: TestDriveBooking) => td.status === "COMPLETED")
-      .map((td: TestDriveBooking) => td.carId);
+      .filter((td) => td.status === "COMPLETED")
+      .map((td) => td.carId);
 
     const soldCarsAfterTestDrive = cars.filter(
-      (car: TestDriveBooking) =>
+      (car) =>
         car.status === "SOLD" && completedTestDriveCarIds.includes(car.id)
     ).length;
 
