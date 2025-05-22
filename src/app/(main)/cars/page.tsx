@@ -1,15 +1,16 @@
-// import { CarFilters } from "./_components/car-filters";
-// import { getCarFilters } from "@/actions/car-listing";
-// import { CarListings } from "./_components/cars-listing";
+import { CarFilters } from "./_components/carFilters";
+import { getCarFilters } from "@/actions/car-listing";
+import { CarListings } from "./_components/carListing";
 
 export const metadata = {
   title: "Cars | Autora",
   description: "Browse and search for your dream car",
+  
 };
 
 export default async function CarsPage() {
   // Fetch filters data on the server
-//   const filtersData = await getCarFilters();
+  const filtersData = await getCarFilters();
 
   return (
     <div className="container mx-auto px-4 py-10">
@@ -18,7 +19,7 @@ export default async function CarsPage() {
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Filters Section */}
         <div className="w-full lg:w-80 flex-shrink-0">
-          {/* <CarFilters filters={filtersData.data} /> */}
+          <CarFilters filters={filtersData.data} />
         </div>
 
         {/* Car Listings */}

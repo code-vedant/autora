@@ -13,7 +13,7 @@ import {
   SheetTrigger,
   SheetFooter,
 } from "@/components/ui/sheet";
-import { CarFilterControls } from "./filter-controls";
+import { CarFilterControls } from "./filterControls";
 import {
   Select,
   SelectContent,
@@ -22,46 +22,60 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export const CarFilters = ({ filters }) => {
+type Filters = {
+  brands: string[];
+  bodyTypes: string[];
+  fuelTypes: string[];
+  transmissions: string[];
+  priceRange: {
+    min: number;
+    max: number;
+  };
+};
+
+type CarFiltersProps = {
+  filters: Filters;
+};
+
+type FilterName = "brand" | "bodyType" | "fuelType" | "transmission" | "priceRange";
+
+export const CarFilters = ({ filters }: CarFiltersProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Get current filter values from searchParams
-  const currentMake = searchParams.get("make") || "";
+  const currentbrand = searchParams.get("brand") || "";
   const currentBodyType = searchParams.get("bodyType") || "";
   const currentFuelType = searchParams.get("fuelType") || "";
   const currentTransmission = searchParams.get("transmission") || "";
   const currentMinPrice = searchParams.get("minPrice")
-    ? parseInt(searchParams.get("minPrice"))
+    ? parseInt(searchParams.get("minPrice")!)
     : filters.priceRange.min;
   const currentMaxPrice = searchParams.get("maxPrice")
-    ? parseInt(searchParams.get("maxPrice"))
+    ? parseInt(searchParams.get("maxPrice")!)
     : filters.priceRange.max;
   const currentSortBy = searchParams.get("sortBy") || "newest";
 
-  // Local state for filters
-  const [make, setMake] = useState(currentMake);
-  const [bodyType, setBodyType] = useState(currentBodyType);
-  const [fuelType, setFuelType] = useState(currentFuelType);
-  const [transmission, setTransmission] = useState(currentTransmission);
-  const [priceRange, setPriceRange] = useState([
+  const [brand, setBrand] = useState<string>(currentbrand);
+  const [bodyType, setBodyType] = useState<string>(currentBodyType);
+  const [fuelType, setFuelType] = useState<string>(currentFuelType);
+  const [transmission, setTransmission] = useState<string>(currentTransmission);
+  const [priceRange, setPriceRange] = useState<[number, number]>([
     currentMinPrice,
     currentMaxPrice,
   ]);
-  const [sortBy, setSortBy] = useState(currentSortBy);
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<string>(currentSortBy);
+  const [isSheetOpen, setIsSheetOpen] = useState<boolean>(false);
 
-  // Update local state when URL parameters change
   useEffect(() => {
-    setMake(currentMake);
+    setBrand(currentbrand);
     setBodyType(currentBodyType);
     setFuelType(currentFuelType);
     setTransmission(currentTransmission);
     setPriceRange([currentMinPrice, currentMaxPrice]);
     setSortBy(currentSortBy);
   }, [
-    currentMake,
+    currentbrand,
     currentBodyType,
     currentFuelType,
     currentTransmission,
@@ -70,9 +84,8 @@ export const CarFilters = ({ filters }) => {
     currentSortBy,
   ]);
 
-  // Count active filters
   const activeFilterCount = [
-    make,
+    brand,
     bodyType,
     fuelType,
     transmission,
@@ -80,11 +93,10 @@ export const CarFilters = ({ filters }) => {
       currentMaxPrice < filters.priceRange.max,
   ].filter(Boolean).length;
 
-  // Update URL when filters change
   const applyFilters = useCallback(() => {
     const params = new URLSearchParams();
 
-    if (make) params.set("make", make);
+    if (brand) params.set("brand", brand);
     if (bodyType) params.set("bodyType", bodyType);
     if (fuelType) params.set("fuelType", fuelType);
     if (transmission) params.set("transmission", transmission);
@@ -94,7 +106,6 @@ export const CarFilters = ({ filters }) => {
       params.set("maxPrice", priceRange[1].toString());
     if (sortBy !== "newest") params.set("sortBy", sortBy);
 
-    // Preserve search and page params if they exist
     const search = searchParams.get("search");
     const page = searchParams.get("page");
     if (search) params.set("search", search);
@@ -106,7 +117,7 @@ export const CarFilters = ({ filters }) => {
     router.push(url);
     setIsSheetOpen(false);
   }, [
-    make,
+    brand,
     bodyType,
     fuelType,
     transmission,
@@ -118,42 +129,45 @@ export const CarFilters = ({ filters }) => {
     filters.priceRange.max,
   ]);
 
-  // Handle filter changes
-  const handleFilterChange = (filterName, value) => {
+  const handleFilterChange = (
+    filterName: FilterName,
+    value: string | [number, number]
+  ) => {
     switch (filterName) {
-      case "make":
-        setMake(value);
+      case "brand":
+        setBrand(value as string);
         break;
       case "bodyType":
-        setBodyType(value);
+        setBodyType(value as string);
         break;
       case "fuelType":
-        setFuelType(value);
+        setFuelType(value as string);
         break;
       case "transmission":
-        setTransmission(value);
+        setTransmission(value as string);
         break;
       case "priceRange":
-        setPriceRange(value);
+        setPriceRange(value as [number, number]);
         break;
     }
   };
 
-  // Handle clearing specific filter
-  const handleClearFilter = (filterName) => {
-    handleFilterChange(filterName, "");
+  const handleClearFilter = (filterName: FilterName) => {
+    if (filterName === "priceRange") {
+      setPriceRange([filters.priceRange.min, filters.priceRange.max]);
+    } else {
+      handleFilterChange(filterName, "");
+    }
   };
 
-  // Clear all filters
   const clearFilters = () => {
-    setMake("");
+    setBrand("");
     setBodyType("");
     setFuelType("");
     setTransmission("");
     setPriceRange([filters.priceRange.min, filters.priceRange.max]);
     setSortBy("newest");
 
-    // Keep search term if exists
     const params = new URLSearchParams();
     const search = searchParams.get("search");
     if (search) params.set("search", search);
@@ -165,9 +179,8 @@ export const CarFilters = ({ filters }) => {
     setIsSheetOpen(false);
   };
 
-  // Current filters object for the controls component
   const currentFilters = {
-    make,
+    brand,
     bodyType,
     fuelType,
     transmission,
@@ -178,7 +191,6 @@ export const CarFilters = ({ filters }) => {
 
   return (
     <div className="flex lg:flex-col justify-between gap-4">
-      {/* Mobile Filters */}
       <div className="lg:hidden mb-4">
         <div className="flex items-center">
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -193,10 +205,7 @@ export const CarFilters = ({ filters }) => {
                 )}
               </Button>
             </SheetTrigger>
-            <SheetContent
-              side="left"
-              className="w-full sm:max-w-md overflow-y-auto"
-            >
+            <SheetContent side="left" className="w-full sm:max-w-md overflow-y-auto">
               <SheetHeader>
                 <SheetTitle>Filters</SheetTitle>
               </SheetHeader>
@@ -211,12 +220,7 @@ export const CarFilters = ({ filters }) => {
               </div>
 
               <SheetFooter className="sm:justify-between flex-row pt-2 border-t space-x-4 mt-auto">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={clearFilters}
-                  className="flex-1"
-                >
+                <Button type="button" variant="outline" onClick={clearFilters} className="flex-1">
                   Reset
                 </Button>
                 <Button type="button" onClick={applyFilters} className="flex-1">
@@ -232,7 +236,6 @@ export const CarFilters = ({ filters }) => {
         value={sortBy}
         onValueChange={(value) => {
           setSortBy(value);
-          // Apply filters immediately when sort changes
           setTimeout(() => applyFilters(), 0);
         }}
       >
@@ -252,7 +255,6 @@ export const CarFilters = ({ filters }) => {
         </SelectContent>
       </Select>
 
-      {/* Desktop Filters */}
       <div className="hidden lg:block sticky top-24">
         <div className="border rounded-lg overflow-hidden bg-white">
           <div className="p-4 border-b bg-gray-50 flex justify-between items-center">

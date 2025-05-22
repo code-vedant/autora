@@ -20,7 +20,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { TestDriveCard } from "@/components/test-drive-card";
+import { TestDriveCard } from "@/components/testDriveCard";
 import useFetch from "@/hooks/use-fetch";
 import { getAdminTestDrives, updateTestDriveStatus } from "@/actions/admin";
 import { cancelTestDrive } from "@/actions/test-drive";

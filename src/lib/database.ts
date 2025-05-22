@@ -1,7 +1,7 @@
 export const featuredCars = [
     {
       id: 1,
-      make: "Toyota",
+      brand: "Toyota",
       model: "Camry",
       year: 2023,
       price: 28999,
@@ -15,7 +15,7 @@ export const featuredCars = [
     },
     {
       id: 2,
-      make: "Honda",
+      brand: "Honda",
       model: "Civic",
       year: 2023,
       price: 26499,
@@ -29,7 +29,7 @@ export const featuredCars = [
     },
     {
       id: 3,
-      make: "Tesla",
+      brand: "Tesla",
       model: "Model 3",
       year: 2022,
       price: 42999,
@@ -43,13 +43,13 @@ export const featuredCars = [
     },
   ];
   
-  export const carMakes = [
-    { id: 1, name: "Hyundai", image: "/make/hyundai.webp" },
-    { id: 2, name: "Honda", image: "/make/honda.webp" },
-    { id: 3, name: "BMW", image: "/make/bmw.webp" },
-    { id: 4, name: "Tata", image: "/make/tata.webp" },
-    { id: 5, name: "Mahindra", image: "/make/mahindra.webp" },
-    { id: 6, name: "Ford", image: "/make/ford.webp" },
+  export const carBrands = [
+    { id: 1, name: "Hyundai", image: "/brand/hyundai.webp" },
+    { id: 2, name: "Honda", image: "/brand/honda.webp" },
+    { id: 3, name: "BMW", image: "/brand/bmw.webp" },
+    { id: 4, name: "Tata", image: "/brand/tata.webp" },
+    { id: 5, name: "Mahindra", image: "/brand/mahindra.webp" },
+    { id: 6, name: "Ford", image: "/brand/ford.webp" },
   ];
   
   export const bodyTypes = [

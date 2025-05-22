@@ -1,7 +1,7 @@
 import { TestDrivesList } from "./_components/testDriveList";
 
 export const metadata = {
-  title: "Test Drives | Vehiql Admin",
+  title: "Test Drives | Autora Admin",
   description: "Manage test drive bookings",
 };
 

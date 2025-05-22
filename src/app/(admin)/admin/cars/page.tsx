@@ -1,7 +1,7 @@
 import { CarsList } from "./_components/carList";
 
 export const metadata = {
-  title: "Cars | Vehiql Admin",
+  title: "Cars | Autora Admin",
   description: "Manage cars in your marketplace",
 };
 

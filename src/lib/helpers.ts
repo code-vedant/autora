@@ -16,7 +16,7 @@ interface SerializedCar {
 
 
 
-export const serializeCarData = (car: any , wishlisted: boolean) => {
+export const serializeCarData = (car: any , wishlisted?: boolean) => {
   return {
     ...car,
     price: car.price ? parseFloat(car.price.toString()) : 0,

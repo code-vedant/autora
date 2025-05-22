@@ -65,8 +65,8 @@ export const CarCard = ({ car}:{car: any}) => {
         {car.images && car.images.length > 0 ? (
           <div className="relative w-full h-full">
             <Image
-              src={car.images[0]}
-              alt={`${car.make} ${car.model}`}
+              src={"/creata.jpeg"}
+              alt={`${car.brand} ${car.model}`}
               fill
               className="object-cover group-hover:scale-105 transition duration-300"
             />
@@ -99,10 +99,10 @@ export const CarCard = ({ car}:{car: any}) => {
       <CardContent className="p-4">
         <div className="flex flex-col mb-2">
           <h3 className="text-lg font-bold line-clamp-1">
-            {car.make} {car.model}
+            {car.brand} {car.model}
           </h3>
           <span className="text-xl font-bold text-blue-600">
-            ${car.price.toLocaleString()}
+          ₹{car.price.toLocaleString()}
           </span>
         </div>
 

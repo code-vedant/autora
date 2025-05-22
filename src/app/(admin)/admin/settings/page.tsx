@@ -1,7 +1,7 @@
-import { SettingsForm } from "./_components/settings-form";
+import { SettingsForm } from "./_components/settingsForm";
 
 export const metadata = {
-  title: "Settings | Vehiql Admin",
+  title: "Settings | Autora Admin",
   description: "Manage dealership working hours and admin users",
 };
 

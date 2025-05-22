@@ -4,35 +4,61 @@ import { Check, X } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 
+type FilterOptions = {
+  brands: string[];
+  bodyTypes: string[];
+  fuelTypes: string[];
+  transmissions: string[];
+  priceRange: {
+    min: number;
+    max: number;
+  };
+};
+
+type CurrentFilters = {
+  brand: string;
+  bodyType: string;
+  fuelType: string;
+  transmission: string;
+  priceRange: [number, number];
+};
+
+type CarFilterControlsProps = {
+  filters: FilterOptions;
+  currentFilters: CurrentFilters;
+  onFilterChange: (key: keyof CurrentFilters, value: string | [number, number]) => void;
+  onClearFilter: (key: keyof CurrentFilters) => void;
+};
+
 export const CarFilterControls = ({
   filters,
   currentFilters,
   onFilterChange,
   onClearFilter,
-}) => {
-  const { make, bodyType, fuelType, transmission, priceRange } = currentFilters;
+}: CarFilterControlsProps) => {
+  const { brand, bodyType, fuelType, transmission, priceRange } = currentFilters;
 
   const filterSections = [
     {
-      id: "make",
-      title: "Make",
-      options: filters.makes.map((make) => ({ value: make, label: make })),
-      currentValue: make,
-      onChange: (value) => onFilterChange("make", value),
+      id: "brand",
+      title: "Brand",
+      options: filters.brands.map((brand) => ({ value: brand, label: brand })),
+      currentValue: brand,
+      onChange: (value: string) => onFilterChange("brand", value),
     },
     {
       id: "bodyType",
       title: "Body Type",
       options: filters.bodyTypes.map((type) => ({ value: type, label: type })),
       currentValue: bodyType,
-      onChange: (value) => onFilterChange("bodyType", value),
+      onChange: (value: string) => onFilterChange("bodyType", value),
     },
     {
       id: "fuelType",
       title: "Fuel Type",
       options: filters.fuelTypes.map((type) => ({ value: type, label: type })),
       currentValue: fuelType,
-      onChange: (value) => onFilterChange("fuelType", value),
+      onChange: (value: string) => onFilterChange("fuelType", value),
     },
     {
       id: "transmission",
@@ -42,7 +68,7 @@ export const CarFilterControls = ({
         label: type,
       })),
       currentValue: transmission,
-      onChange: (value) => onFilterChange("transmission", value),
+      onChange: (value: string) => onFilterChange("transmission", value),
     },
   ];
 
@@ -57,12 +83,12 @@ export const CarFilterControls = ({
             max={filters.priceRange.max}
             step={100}
             value={priceRange}
-            onValueChange={(value) => onFilterChange("priceRange", value)}
+            onValueChange={(value: [number, number]) => onFilterChange("priceRange", value)}
           />
         </div>
         <div className="flex items-center justify-between">
-          <div className="font-medium text-sm">$ {priceRange[0]}</div>
-          <div className="font-medium text-sm">$ {priceRange[1]}</div>
+          <div className="font-medium text-sm">₹ {priceRange[0]}</div>
+          <div className="font-medium text-sm">₹ {priceRange[1]}</div>
         </div>
       </div>
 
@@ -74,7 +100,7 @@ export const CarFilterControls = ({
             {section.currentValue && (
               <button
                 className="text-xs text-gray-600 flex items-center"
-                onClick={() => onClearFilter(section.id)}
+                onClick={() => onClearFilter(section.id as keyof CurrentFilters)}
               >
                 <X className="mr-1 h-3 w-3" />
                 Clear

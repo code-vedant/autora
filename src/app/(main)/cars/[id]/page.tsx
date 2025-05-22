@@ -1,14 +1,14 @@
 import { getCarById } from "@/actions/car-listing";
-import { CarDetails } from "./_components/car-details";
+import { CarDetails } from "./_components/carDetails";
 import { notFound } from "next/navigation";
 
-export async function generateMetadata({ params }) {
-  const { id } = await params;
+export async function generateMetadata({ params }:{ params: { id: string } }) {
+  const { id } = params;
   const result = await getCarById(id);
 
   if (!result.success) {
     return {
-      title: "Car Not Found | Vehiql",
+      title: "Car Not Found | Autora",
       description: "The requested car could not be found",
     };
   }
@@ -16,7 +16,7 @@ export async function generateMetadata({ params }) {
   const car = result.data;
 
   return {
-    title: `${car.year} ${car.make} ${car.model} | Vehiql`,
+    title: `${car.year} ${car.make} ${car.model} | Autora`,
     description: car.description.substring(0, 160),
     openGraph: {
       images: car.images?.[0] ? [car.images[0]] : [],
@@ -24,9 +24,9 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default async function CarDetailsPage({ params }) {
+export default async function CarDetailsPage({ params }:{ params: { id: string } }) {
   // Fetch car details
-  const { id } = await params;
+  const { id } = params;
   const result = await getCarById(id);
 
   // If car not found, show 404

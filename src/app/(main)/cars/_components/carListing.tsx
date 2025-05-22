@@ -6,10 +6,10 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info } from "lucide-react";
-import { CarCard } from "@/components/car-card";
+import { CarCard } from "@/components/carCard";
 import useFetch from "@/hooks/use-fetch";
 import { getCars } from "@/actions/car-listing";
-import CarListingsLoading from "./car-listing-loading";
+import CarListingsLoading from "./carListingLoading";
 
 import {
   Pagination,
@@ -20,6 +20,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Car } from "@prisma/client";
 
 export function CarListings() {
   const searchParams = useSearchParams();
@@ -29,7 +30,7 @@ export function CarListings() {
 
   // Extract filter values from searchParams
   const search = searchParams.get("search") || "";
-  const make = searchParams.get("make") || "";
+  const brand = searchParams.get("brand") || "";
   const bodyType = searchParams.get("bodyType") || "";
   const fuelType = searchParams.get("fuelType") || "";
   const transmission = searchParams.get("transmission") || "";
@@ -45,7 +46,7 @@ export function CarListings() {
   useEffect(() => {
     fetchCars({
       search,
-      make,
+      brand,
       bodyType,
       fuelType,
       transmission,
@@ -57,7 +58,7 @@ export function CarListings() {
     });
   }, [
     search,
-    make,
+    brand,
     bodyType,
     fuelType,
     transmission,
@@ -77,12 +78,12 @@ export function CarListings() {
   }, [currentPage, router, searchParams, page]);
 
   // Handle pagination clicks
-  const handlePageChange = (pageNum) => {
+  const handlePageChange = (pageNum : number) => {
     setCurrentPage(pageNum);
   };
 
   // Generate pagination URL
-  const getPaginationUrl = (pageNum) => {
+  const getPaginationUrl = (pageNum : number) => {
     const params = new URLSearchParams(searchParams);
     params.set("page", pageNum.toString());
     return `?${params.toString()}`;
@@ -133,7 +134,7 @@ export function CarListings() {
   }
 
   // Generate pagination items
-  const paginationItems = [];
+  const paginationItems : any[] = [];
 
   // Calculate which page numbers to show (first, last, and around current page)
   const visiblePageNumbers = [];

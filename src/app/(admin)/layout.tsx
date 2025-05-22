@@ -9,16 +9,11 @@ interface AdminLayoutProps {
 }
 
 export default async function AdminLayout({ children }: AdminLayoutProps) {
-  const admin = await getAdmin();
-
-  if (!admin.authorized) {
-    return notFound();
-  }
 
   return (
     <div className="h-full">
-      <Header isAdmin={true} />
-      <div className="flex h-full w-56 flex-col  fixed inset-y-0 z-50">
+      <Header />
+      <div className="flex h-full w-56 flex-col fixed inset-y-0 z-40">
         <Sidebar />
       </div>
       <main className="md:pl-56 pt-[80px] h-full">{children}</main>
