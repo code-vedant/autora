@@ -46,6 +46,8 @@ interface GetCarsParams {
   limit?: number;
 }
 
+
+
 export async function getCarFilters(): Promise<CarFiltersResult> {
   try {
     // Get unique brands
@@ -221,12 +223,18 @@ export async function getCars({
   }
 }
 
-interface ToggleSavedCarResult {
-  success: boolean;
-  saved?: boolean;
-  message?: string;
-  error?: string;
+export interface ToggleSavedCarResultSuccess {
+  success: true;
+  saved: boolean;
+  message: string;
 }
+
+export interface ToggleSavedCarResultError {
+  success: false;
+  error: string;
+}
+
+export type ToggleSavedCarResult = ToggleSavedCarResultSuccess | ToggleSavedCarResultError;
 
 /**
  * Toggle car in user's wishlist

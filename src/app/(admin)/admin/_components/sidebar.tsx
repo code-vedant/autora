@@ -46,7 +46,7 @@ export const Sidebar = () => {
       <div className="hidden md:flex h-full flex-col overflow-y-auto bg-white shadow-sm border-r">
         <div className="p-6">
           <Link href="/admin">
-            <h1 className="text-xl font-bold">VehiQl Admin</h1>
+            <h1 className="text-xl font-bold">Autora Admin</h1>
           </Link>
         </div>
         <div className="flex flex-col w-full">

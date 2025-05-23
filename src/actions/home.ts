@@ -55,7 +55,7 @@ async function fileToBase64(file: File): Promise<string> {
 interface ImageSearchResultSuccess {
   success: true;
   data: {
-    make: string;
+    brand: string;
     bodyType: string;
     color: string;
     confidence: number;
@@ -178,7 +178,6 @@ export async function processImageSearch(file: File): Promise<ImageSearchResult>
       };
     } catch (parseError) {
       console.error("Failed to parse AI response:", parseError);
-      console.log("Raw response:", text);
       return {
         success: false,
         error: "Failed to parse AI response",

@@ -200,7 +200,7 @@ export const AddCarForm = () => {
     } = useDropzone({
         onDrop: onMultiImagesDrop,
         accept: {
-            "image/*": [".jpeg", ".jpg", ".png", ".webp"],
+            "image/*": [".jpeg", ".jpg", ".png", ".webp",".avif"],
         },
         multiple: true,
     });

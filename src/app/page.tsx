@@ -12,11 +12,11 @@ import { CarCard } from "@/components/carCard";
 import { HomeSearch } from "@/components/homeSearch";
 import Link from "next/link";
 import Image from "next/image";
-import { bodyTypes, carBrands, faqItems,featuredCars } from "@/lib/database";
+import { bodyTypes, carBrands, faqItems } from "@/lib/database";
 import Footer from "@/components/footer";
 
 export default async function Home() {
-  // const featuredCars = await getFeaturedCars();
+  const featuredCars = await getFeaturedCars();
 
   return (
     <div className="flex flex-col mt-14">

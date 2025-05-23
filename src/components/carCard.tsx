@@ -65,7 +65,7 @@ export const CarCard = ({ car}:{car: any}) => {
         {car.images && car.images.length > 0 ? (
           <div className="relative w-full h-full">
             <Image
-              src={"/creata.jpeg"}
+              src={car.images[0]}
               alt={`${car.brand} ${car.model}`}
               fill
               className="object-cover group-hover:scale-105 transition duration-300"

@@ -10,11 +10,7 @@ import { auth } from "@clerk/nextjs/server";
 import { serializeCarData } from "@/lib/helpers";
 import { CarStatus } from "@prisma/client";
 
-async function fileToBase64(file: File) {
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  return buffer.toString("base64");
-}
+
 
 export async function processImagewithAI(file: File) {
   try {
@@ -40,7 +36,7 @@ export async function processImagewithAI(file: File) {
       3. Year (approximately)
       4. Color (primary major color only)
       5. Body type (SUV, Sedan, Hatchback, etc.)
-      6. Mileage
+      6. Mileage in km
       7. Fuel type (your best guess)
       8. Transmission type (your best guess)
       9. Price (your best guess) in Indian rupees , just give number
@@ -98,7 +94,6 @@ export async function processImagewithAI(file: File) {
       };
     } catch (parseError) {
       console.error("Failed to parse AI response:", parseError);
-      console.log("Raw response:", text);
       return {
         success: false,
         error: "Failed to parse AI response",
@@ -109,6 +104,7 @@ export async function processImagewithAI(file: File) {
     throw new Error("Gemini API error: " + error);
   }
 }
+
 interface CarData {
   brand: string;
   model: string;
@@ -125,92 +121,88 @@ interface CarData {
   featured: boolean;
 }
 
+async function fileToBase64(file: File) {
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+  return buffer.toString("base64");
+}
+
 export async function addCar({
   carData,
   images,
 }: {
   carData: CarData;
-  images: File[];
+  images: string[];
 }) {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
-    const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
-    });
-
+    const user = await db.user.findUnique({ where: { clerkUserId: userId } });
     if (!user) throw new Error("User not found");
 
     const carId = uuidv4();
     const folderPath = `cars/${carId}`;
-
     const supabase = await createClient();
-
-    const imagesUrl = [];
+    const imageUrls: string[] = [];
 
     for (let i = 0; i < images.length; i++) {
       const base64Data = images[i];
+      if (!base64Data || !base64Data.startsWith("data:image/")) continue;
 
-      if (!base64Data || !base64Data.type.startsWith("data:image/")) {
-        console.warn("Skipping invalid image data");
-        continue;
-      }
-
-      const base64String = base64Data.type.split(",")[1];
-      const buffer = Buffer.from(base64String, "base64");
-
-      const mimeMatch = base64Data.type.match(/data:(image\/[a-zA-Z0-9]+);/);
+      const base64 = base64Data.split(",")[1];
+      const imageBuffer = Buffer.from(base64, "base64");
+      const mimeMatch = base64Data.match(/data:image\/([a-zA-Z0-9]+);/);
       const fileExtension = mimeMatch ? mimeMatch[1] : "jpeg";
       const fileName = `image-${Date.now()}-${i}.${fileExtension}`;
       const filePath = `${folderPath}/${fileName}`;
-      const { data, error } = await supabase.storage
-        .from("car-images")
-        .upload(filePath, buffer, {
+
+      const { error } = await supabase.storage
+        .from("cars-images")
+        .upload(filePath, imageBuffer, {
           contentType: `image/${fileExtension}`,
         });
 
-      if (error) {
-        console.error("Error uploading image:", error);
-        throw new Error("Failed to upload image");
-      }
+      if (error) throw new Error(`Failed to upload image: ${error.message as string}`);
 
-      const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public.car-images/${filePath}`;
-      imagesUrl.push(publicUrl);
+      const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/cars-images/${filePath}`;
+      imageUrls.push(publicUrl);
     }
 
-    if (imagesUrl.length === 0) {
-      throw new Error("No images uploaded");
+    if (imageUrls.length === 0) {
+      throw new Error("No valid images were uploaded");
     }
 
-    const car = await db.car.create({
+    // Ensure mileage is a number
+    const mileage = typeof carData.mileage === "string" ? parseFloat(carData.mileage) : carData.mileage;
+    if (isNaN(mileage)) {
+      throw new Error("Invalid mileage value");
+    }
+
+    // Validate the status value, if it's provided
+    const status = carData.status;
+    if (status && !Object.values(CarStatus).includes(status as CarStatus)) {
+      throw new Error("Invalid status value");
+    }
+
+    await db.car.create({
       data: {
         id: carId,
-        brand: carData.brand,
-        model: carData.model,
-        year: carData.year,
-        price: carData.price,
-        mileage: carData.mileage,
-        color: carData.color,
-        fuelType: carData.fuelType,
-        transmission: carData.transmission,
-        bodyType: carData.bodyType,
-        seats: carData.seats,
-        description: carData.description,
-        status: carData.status,
-        featured: carData.featured,
-        images: imagesUrl,
+        ...carData,
+        mileage, // Ensure mileage is a valid number
+        status: status as CarStatus | undefined, // Explicitly cast to CarStatus enum
+        images: imageUrls,
       },
     });
 
     revalidatePath("/admin/cars");
 
-    return {
-      success: true,
-    };
-  } catch (error) {
-    console.error("Error adding car:", error);
-    throw new Error("Failed to add car");
+    return { success: true };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      throw new Error("Error adding car: " + error.message);
+    }
+    throw new Error("Unknown error adding car");
   }
 }
 
@@ -218,7 +210,7 @@ export async function getCars(search = "") {
   try {
     type whereType = {
       OR?: Array<{
-        make?: { contains: string; mode: "insensitive" };
+        brand?: { contains: string; mode: "insensitive" };
         model?: { contains: string; mode: "insensitive" };
         color?: { contains: string; mode: "insensitive" };
       }>;
@@ -230,7 +222,7 @@ export async function getCars(search = "") {
       where = {
         OR: [
           {
-            make: {
+            brand: {
               contains: search,
               mode: "insensitive",
             },
@@ -255,6 +247,7 @@ export async function getCars(search = "") {
       where,
       orderBy: { createdAt: "desc" },
     });
+    
 
     const serializedCars = cars.map((car) => {
       return serializeCarData(car);
@@ -292,19 +285,20 @@ export async function deleteCar(id: string) {
     });
 
     try {
+
       const supabase = await createClient();
 
       const filePaths = car.images
         .map((imageUrl) => {
           const url = new URL(imageUrl);
-          const pathMatch = url.pathname.match(/\/car-images\/(.*)/);
+          const pathMatch = url.pathname.match(/\/cars-images\/(.*)/);
           return pathMatch ? pathMatch[1] : null;
         })
         .filter((path): path is string => path !== null);
 
       if (filePaths.length > 0) {
         const { error } = await supabase.storage
-          .from("car-images")
+          .from("cars-images")
           .remove(filePaths);
 
         if (error) {

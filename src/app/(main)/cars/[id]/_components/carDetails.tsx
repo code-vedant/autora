@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { toggleSavedCar } from "@/actions/car-listing";
+import { toggleSavedCar, ToggleSavedCarResult } from "@/actions/car-listing";
 import useFetch from "@/hooks/use-fetch";
 import { formatCurrency } from "@/lib/helpers";
 import { format } from "date-fns";
@@ -31,9 +31,43 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import EmiCalculator from "./emi-calculator";
+import EmiCalculator from "./emicalculator";
 
-export function CarDetails({ car, testDriveInfo }) {
+type DaySchedule = {
+  dayOfWeek: string;
+  isOpen: boolean;
+  openTime: string;
+  closeTime: string;
+};
+
+type CarDetailsProps = {
+  id: string;
+  brand: string;
+  model: string;
+  year: string;
+  color: string;
+  price: number;
+  mileage: string;
+  bodyType: string;
+  fuelType: string;
+  transmission: string;
+  description: string;
+  confidence: string;
+  seats: string;
+  wishlisted: boolean;
+  status: string;
+  images: string[];
+};
+
+
+
+export function CarDetails({
+  car,
+  testDriveInfo,
+}: {
+  car: CarDetailsProps;
+  testDriveInfo: any;
+}) {
   const router = useRouter();
   const { isSignedIn } = useAuth();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -44,7 +78,7 @@ export function CarDetails({ car, testDriveInfo }) {
     fn: toggleSavedCarFn,
     data: toggleResult,
     error: toggleError,
-  } = useFetch(toggleSavedCar);
+  } = useFetch<ToggleSavedCarResult>(toggleSavedCar);
 
   // Handle toggle result with useEffect
   useEffect(() => {
@@ -80,12 +114,12 @@ export function CarDetails({ car, testDriveInfo }) {
     if (navigator.share) {
       navigator
         .share({
-          title: `${car.year} ${car.make} ${car.model}`,
-          text: `Check out this ${car.year} ${car.make} ${car.model} on Vehiql!`,
+          title: `${car.year} ${car.brand} ${car.model}`,
+          text: `Check out this ${car.year} ${car.brand} ${car.model} on Autora!`,
           url: window.location.href,
         })
         .catch((error) => {
-          console.log("Error sharing", error);
+          ("Error sharing", error);
           copyToClipboard();
         });
     } else {
@@ -117,7 +151,7 @@ export function CarDetails({ car, testDriveInfo }) {
             {car.images && car.images.length > 0 ? (
               <Image
                 src={car.images[currentImageIndex]}
-                alt={`${car.year} ${car.make} ${car.model}`}
+                alt={`${car.year} ${car.brand} ${car.model}`}
                 fill
                 className="object-cover"
                 priority
@@ -144,7 +178,7 @@ export function CarDetails({ car, testDriveInfo }) {
                 >
                   <Image
                     src={image}
-                    alt={`${car.year} ${car.make} ${car.model} - view ${
+                    alt={`${car.year} ${car.brand} ${car.model} - view ${
                       index + 1
                     }`}
                     fill
@@ -163,7 +197,7 @@ export function CarDetails({ car, testDriveInfo }) {
                 isWishlisted ? "text-red-500" : ""
               }`}
               onClick={handleSaveCar}
-              disabled={savingCar}
+              disabled={!!savingCar}
             >
               <Heart
                 className={`h-5 w-5 ${isWishlisted ? "fill-red-500" : ""}`}
@@ -188,7 +222,7 @@ export function CarDetails({ car, testDriveInfo }) {
           </div>
 
           <h1 className="text-4xl font-bold mb-1">
-            {car.year} {car.make} {car.model}
+            {car.year} {car.brand} {car.model}
           </h1>
 
           <div className="text-2xl font-bold text-blue-600">
@@ -199,7 +233,7 @@ export function CarDetails({ car, testDriveInfo }) {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 my-6">
             <div className="flex items-center gap-2">
               <Gauge className="text-gray-500 h-5 w-5" />
-              <span>{car.mileage.toLocaleString()} miles</span>
+              <span>{car.mileage.toLocaleString()} km</span>
             </div>
             <div className="flex items-center gap-2">
               <Fuel className="text-gray-500 h-5 w-5" />
@@ -227,14 +261,14 @@ export function CarDetails({ car, testDriveInfo }) {
                     for 60 months
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
-                    *Based on $0 down payment and 4.5% interest rate
+                    *Based on ₹0 down payment and 4.5% interest rate
                   </div>
                 </CardContent>
               </Card>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Vehiql Car Loan Calculator</DialogTitle>
+                <DialogTitle>Autora Car Loan Calculator</DialogTitle>
                 <EmiCalculator price={car.price} />
               </DialogHeader>
             </DialogContent>
@@ -251,7 +285,7 @@ export function CarDetails({ car, testDriveInfo }) {
                 Our representatives are available to answer all your queries
                 about this vehicle.
               </p>
-              <a href="mailto:help@vehiql.in">
+              <a href="mailto:help@autora.in">
                 <Button variant="outline" className="w-full">
                   Request Info
                 </Button>
@@ -332,8 +366,8 @@ export function CarDetails({ car, testDriveInfo }) {
         <div className="bg-gray-50 rounded-lg p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
             <div className="flex justify-between py-2 border-b">
-              <span className="text-gray-600">Make</span>
-              <span className="font-medium">{car.make}</span>
+              <span className="text-gray-600">brand</span>
+              <span className="font-medium">{car.brand}</span>
             </div>
             <div className="flex justify-between py-2 border-b">
               <span className="text-gray-600">Model</span>
@@ -358,7 +392,7 @@ export function CarDetails({ car, testDriveInfo }) {
             <div className="flex justify-between py-2 border-b">
               <span className="text-gray-600">Mileage</span>
               <span className="font-medium">
-                {car.mileage.toLocaleString()} miles
+                {car.mileage.toLocaleString()} km
               </span>
             </div>
             <div className="flex justify-between py-2 border-b">
@@ -384,7 +418,7 @@ export function CarDetails({ car, testDriveInfo }) {
             <div className="flex items-start gap-3">
               <LocateFixed className="h-5 w-5 text-blue-600 mt-1 flex-shrink-0" />
               <div>
-                <h4 className="font-medium">Vehiql Motors</h4>
+                <h4 className="font-medium">Autora Motors</h4>
                 <p className="text-gray-600">
                   {testDriveInfo.dealership?.address || "Not Available"}
                 </p>
@@ -403,7 +437,7 @@ export function CarDetails({ car, testDriveInfo }) {
               <div className="space-y-2">
                 {testDriveInfo.dealership?.workingHours
                   ? testDriveInfo.dealership.workingHours
-                      .sort((a, b) => {
+                      .sort(( a: DaySchedule, b: DaySchedule ) => {
                         const days = [
                           "MONDAY",
                           "TUESDAY",
@@ -417,7 +451,7 @@ export function CarDetails({ car, testDriveInfo }) {
                           days.indexOf(a.dayOfWeek) - days.indexOf(b.dayOfWeek)
                         );
                       })
-                      .map((day) => (
+                      .map((day: DaySchedule) => (
                         <div
                           key={day.dayOfWeek}
                           className="flex justify-between text-sm"

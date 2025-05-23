@@ -80,6 +80,7 @@ export const CarsList = () => {
     fetchCars(search);
   }, [search]);
 
+
   useEffect(() => {
     if (carsError) toast.error("Failed to load cars");
     if (deleteError) toast.error("Failed to delete car");
@@ -179,7 +180,7 @@ export const CarsList = () => {
             <div className="flex justify-center items-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
             </div>
-          ) : carsData?.data && carsData.data.length > 0 ? (
+          ) : carsData?.cars && carsData.cars.length > 0 ? (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -194,7 +195,7 @@ export const CarsList = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {carsData && carsData.data?.map((car) => (
+                  {carsData && carsData.cars?.map((car) => (
                     <TableRow key={car.id}>
                       <TableCell>
                         <div className="w-10 h-10 rounded-md overflow-hidden">
