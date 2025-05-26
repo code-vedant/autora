@@ -183,6 +183,7 @@ export async function addCar({
       data: {
         id: carId,
         ...carData,
+        mileage: String(carData.mileage),
         status: status as CarStatus | undefined, // Explicitly cast to CarStatus enum
         images: imageUrls,
       },
