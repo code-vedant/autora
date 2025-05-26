@@ -2,10 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 
-type EmiCalculatorProps = {
-  price?: number;
-};
-
 type EmiResults = {
   emi: string;
   totalInterest: string;
@@ -93,7 +89,7 @@ function EmiCalculator({ price = 600000 }) {
   }, []);
 
   const formatNumber = (num: string | number): string => {
-    return new Intl.NumberFormat("en-US").format(Number(num));
+    return new Intl.NumberFormat("en-IN").format(Number(num));
   };
 
   return (

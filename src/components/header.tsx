@@ -2,7 +2,7 @@ import React, { use } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "./ui/button";
-import { Heart, CarFront, Layout, ArrowLeft } from "lucide-react";
+import { Heart, CarFront, Layout } from "lucide-react";
 import {
   SignedIn,
   SignedOut,
@@ -19,15 +19,14 @@ const Header = async () => {
   return (
     <header className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b ">
       <nav className="mx-auto px-4 py-1 flex items-center justify-between">
-        <Link href={"/"} className="flex items-center gap-2">
+        <Link href={"/"} className="flex h-12 items-center gap-2">
           <Image
             src="/logo.png"
             alt="Autora Logo"
             width={200}
-            height={60}
+            height={200}
             className="h-12 w-auto object-contain"
           />
-          <h1 className="text-3xl font-bold">Autora</h1>
         </Link>
 
         <div className="flex items-center space-x-4">

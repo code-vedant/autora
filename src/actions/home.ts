@@ -130,17 +130,18 @@ export async function processImageSearch(file: File): Promise<ImageSearchResult>
 
     // Define the prompt for car search extraction
     const prompt = `
-      A Analyze this car image and extract the following information:
-      1. Brand (manufacturer)
+      Analyze this car image and extract the following information:
+      1. brand (manufacturer)
       2. Model
       3. Year (approximately)
-      4. Color
+      4. Color (primary major color only)
       5. Body type (SUV, Sedan, Hatchback, etc.)
-      6. Mileage
+      6. Mileage in kmpl with unit 'kmpl' or N/A if not available or electric per charge distance
       7. Fuel type (your best guess)
-      8. Transmission type (your best guess)
-      9. Price (your best guess in INR)
-      9. Short Description as to be added to a car listing
+      8. no of seats
+      9. Transmission type (your best guess)
+      10. Price (your best guess) in Indian rupees , just give number
+      11. Short Description as to be added to a car listing
 
       Format your response as a clean JSON object with these fields:
       {
@@ -150,6 +151,7 @@ export async function processImageSearch(file: File): Promise<ImageSearchResult>
         "color": "",
         "price": "",
         "mileage": "",
+        "seats":"",
         "bodyType": "",
         "fuelType": "",
         "transmission": "",

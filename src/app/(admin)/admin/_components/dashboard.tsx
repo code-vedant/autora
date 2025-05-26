@@ -4,8 +4,6 @@ import { useState } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -19,35 +17,29 @@ import {
   CheckCircle,
   Clock,
   XCircle,
-  Star,
   IndianRupee,
 } from "lucide-react";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+
 import {
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
-  Rectangle,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 
-type ChartDataItem = {
-  status: string;
-  count: number;
-  fill: string;
-};
+// type ChartDataItem = {
+//   status: string;
+//   count: number;
+//   fill: string;
+// };
 
-interface StatusBarChartProps {
-  chartData: ChartDataItem[];
-}
+// interface StatusBarChartProps {
+//   chartData: ChartDataItem[];
+// }
 
 const CustomTooltip = ({
   active,

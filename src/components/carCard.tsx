@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { Heart, Car as CarIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import { toggleSavedCar } from "@/actions/carListing";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import useFetch from "@/hooks/use-fetch";
+import { formatCurrency } from "@/lib/helper";
 
 export const CarCard = ({ car}:{car: any}) => {
   const { isSignedIn } = useAuth();
@@ -101,7 +101,7 @@ export const CarCard = ({ car}:{car: any}) => {
             {car.brand} {car.model}
           </h3>
           <span className="text-xl font-bold text-blue-600">
-          ₹{car.price.toLocaleString()}
+           {formatCurrency(car.price)}
           </span>
         </div>
 

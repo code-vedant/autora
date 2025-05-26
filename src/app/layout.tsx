@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: "AUTORA | Find your dream car",
   description: "Find and get your dream Car",
+  icons:{
+    icon: "/favicon.webp",
+  },
 };
 
 export default function RootLayout({

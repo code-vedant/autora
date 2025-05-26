@@ -9,8 +9,6 @@ import { auth } from "@clerk/nextjs/server";
 import { serializeCarData } from "@/lib/helper";
 import { Car, CarStatus } from "@/generated/prisma";
 
-
-
 export async function processImagewithAI(file: File) {
   try {
     if (!process.env.GEMINI_API_KEY) {
@@ -35,7 +33,7 @@ export async function processImagewithAI(file: File) {
       3. Year (approximately)
       4. Color (primary major color only)
       5. Body type (SUV, Sedan, Hatchback, etc.)
-      6. Mileage in kmpl with unit 'kmpl'
+      6. Mileage in kmpl with unit 'kmpl' or N/A if not available or electric per charge distance
       7. Fuel type (your best guess)
       8. no of seats
       9. Transmission type (your best guess)
