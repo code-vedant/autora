@@ -3,9 +3,9 @@ import { CarDetails } from "./_components/carDetails";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
-type Params = { params: { id: string } };
+type CarRouteParams = { params: { id: string } };
 
-export async function generateMetadata({ params }: Params): Promise<Metadata> {
+export async function generateMetadata({ params }:CarRouteParams) {
   const { id } = params;
   const result = await getCarById(id);
 
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   };
 }
 
-export default async function CarDetailsPage({ params }:Params) {
+export default async function CarDetailsPage({ params }:CarRouteParams) {
   // Fetch car details
   const { id } =  params;
   const result = await getCarById(id);
