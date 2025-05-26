@@ -9,9 +9,9 @@ export async function generateMetadata() {
   };
 }
 
-type testDriveProps = { params: { id: string } };
+// type testDriveProps = { params: { id: string } };
 
-export default async function TestDrivePage({ params } : testDriveProps) {
+export default async function TestDrivePage({ params } : any) {
   // Fetch car details
   const { id } = params;
   const result = await getCarById(id);
