@@ -253,37 +253,37 @@ export async function getDashboardData() {
 
     const totalCars = cars.length;
     const availableCars = cars.filter(
-      (car : Car) => car.status === "AVAILABLE"
+      (car) => car.status === "AVAILABLE"
     ).length;
-    const soldCars = cars.filter((car : Car) => car.status === "SOLD").length;
+    const soldCars = cars.filter((car) => car.status === "SOLD").length;
     const unavailableCars = cars.filter(
-      (car : Car) => car.status === "UNAVAILABLE"
+      (car ) => car.status === "UNAVAILABLE"
     ).length;
-    const featuredCars = cars.filter((car : Car) => car.featured === true).length;
+    const featuredCars = cars.filter((car) => car.featured === true).length;
 
     const totalTestDrives = testDrives.length;
     const pendingTestDrives = testDrives.filter(
-      (td : TestDriveBooking) => td.status === "PENDING"
+      (td ) => td.status === "PENDING"
     ).length;
     const confirmedTestDrives = testDrives.filter(
-      (td : TestDriveBooking) => td.status === "CONFIRMED"
+      (td ) => td.status === "CONFIRMED"
     ).length;
     const completedTestDrives = testDrives.filter(
-      (td : TestDriveBooking) => td.status === "COMPLETED"
+      (td ) => td.status === "COMPLETED"
     ).length;
     const cancelledTestDrives = testDrives.filter(
-      (td : TestDriveBooking) => td.status === "CANCELLED"
+      (td ) => td.status === "CANCELLED"
     ).length;
     const noShowTestDrives = testDrives.filter(
-      (td : TestDriveBooking) => td.status === "NO_SHOW"
+      (td ) => td.status === "NO_SHOW"
     ).length;
 
     const completedTestDriveCarIds = testDrives
-      .filter((td : TestDriveBooking) => td.status === "COMPLETED")
-      .map((td : TestDriveBooking) => td.carId);
+      .filter((td ) => td.status === "COMPLETED")
+      .map((td ) => td.carId);
 
     const soldCarsAfterTestDrive = cars.filter(
-      (car : Car) =>
+      (car ) =>
         car.status === "SOLD" && completedTestDriveCarIds.includes(car.id)
     ).length;
 
