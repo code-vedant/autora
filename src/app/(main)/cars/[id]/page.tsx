@@ -2,7 +2,13 @@ import { getCarById } from "@/actions/carListing";
 import { CarDetails } from "./_components/carDetails";
 import { notFound } from "next/navigation";
 
-export async function generateMetadata({ params }:{ params: { id: string } }) {
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
+
+export async function generateMetadata({ params } : PageProps) {
   const { id } = params;
   const result = await getCarById(id);
 
@@ -24,7 +30,7 @@ export async function generateMetadata({ params }:{ params: { id: string } }) {
   };
 }
 
-export default async function CarDetailsPage({ params }:{ params: { id: string } }) {
+export default async function CarDetailsPage({ params }:PageProps) {
   // Fetch car details
   const { id } =  params;
   const result = await getCarById(id);

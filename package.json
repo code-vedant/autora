@@ -1,6 +1,6 @@
 {
-  "name": "autora-redo",
-  "version": "0.1.0",
+  "name": "autora",
+  "version": "0.8.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
