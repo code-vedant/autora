@@ -8,7 +8,7 @@ interface PageProps {
   };
 }
 
-export async function generateMetadata({ params } : PageProps) {
+export async function generateMetadata({ params }: { params: { id: string } }) {
   const { id } = params;
   const result = await getCarById(id);
 
@@ -30,7 +30,7 @@ export async function generateMetadata({ params } : PageProps) {
   };
 }
 
-export default async function CarDetailsPage({ params }:PageProps) {
+export default async function CarDetailsPage({ params }: { params: { id: string } }) {
   // Fetch car details
   const { id } =  params;
   const result = await getCarById(id);
