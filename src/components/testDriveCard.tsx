@@ -90,7 +90,7 @@ export function TestDriveCard({
               <div className="relative w-full h-full">
                 <Image
                   src={booking.car.images[0]}
-                  alt={`${booking.car.make} ${booking.car.model}`}
+                  alt={`${booking.car.brand} ${booking.car.model}`}
                   fill
                   className="object-cover"
                 />
@@ -112,7 +112,7 @@ export function TestDriveCard({
             </div>
 
             <h3 className="text-lg font-bold mb-1">
-              {booking.car.year} {booking.car.make} {booking.car.model}{" "}
+              {booking.car.year} {booking.car.brand} {booking.car.model}{" "}
             </h3>
             {renderStatusSelector()}
 
@@ -190,7 +190,7 @@ export function TestDriveCard({
               <DialogTitle>Cancel Test Drive</DialogTitle>
               <DialogDescription>
                 Are you sure you want to cancel your test drive for the{" "}
-                {booking.car.year} {booking.car.make} {booking.car.model}? This
+                {booking.car.year} {booking.car.brand} {booking.car.model}? This
                 action cannot be undone.
               </DialogDescription>
             </DialogHeader>

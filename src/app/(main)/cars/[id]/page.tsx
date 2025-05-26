@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 
 type CarRouteParams = { params: { id: string } };
 
-export async function generateMetadata({ params }:CarRouteParams) {
+export async function generateMetadata({ params }:any) {
   const { id } = params;
   const result = await getCarById(id);
 
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }:CarRouteParams) {
   const car = result.data;
 
   return {
-    title: `${car.year} ${car.make} ${car.model} | Autora`,
+    title: `${car.year} ${car.brand} ${car.model} | Autora`,
     description: car.description.substring(0, 160),
     openGraph: {
       images: car.images?.[0] ? [car.images[0]] : [],
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }:CarRouteParams) {
   };
 }
 
-export default async function CarDetailsPage({ params }:CarRouteParams) {
+export default async function CarDetailsPage({ params }:any) {
   // Fetch car details
   const { id } =  params;
   const result = await getCarById(id);
@@ -36,6 +36,7 @@ export default async function CarDetailsPage({ params }:CarRouteParams) {
   if (!result.success) {
     notFound();
   }
+
 
   return (
     <div className="container mx-auto px-4 py-2">
