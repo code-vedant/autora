@@ -59,7 +59,7 @@ export const TestDrivesList = () => {
   // Initial fetch and refetch on search/filter changes
   useEffect(() => {
     fetchTestDrives({ search, status: statusFilter });
-  }, [search, statusFilter]);
+  }, [fetchTestDrives,search, statusFilter]);
 
   // Handle errors
   useEffect(() => {
@@ -84,7 +84,7 @@ export const TestDrivesList = () => {
       toast.success("Test drive cancelled successfully");
       fetchTestDrives({ search, status: statusFilter });
     }
-  }, [updateResult, cancelResult]);
+  }, [fetchTestDrives,search,statusFilter,updateResult, cancelResult]);
 
   // Handle search submit
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {

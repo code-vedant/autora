@@ -113,7 +113,7 @@ export const SettingsForm = () => {
   useEffect(() => {
     fetchDealershipInfo();
     fetchUsers();
-  }, []);
+  }, [fetchDealershipInfo,fetchUsers]);
 
   // Set working hours when settings data is fetched
   useEffect(() => {
@@ -183,7 +183,7 @@ export const SettingsForm = () => {
       setConfirmAdminDialog(false);
       setConfirmRemoveDialog(false);
     }
-  }, [saveResult, updateRoleResult]);
+  }, [fetchDealershipInfo,fetchUsers,saveResult, updateRoleResult]);
 
   // Handle working hours change
   const handleWorkingHourChange = (index: number, field : string, value : string | boolean) => {

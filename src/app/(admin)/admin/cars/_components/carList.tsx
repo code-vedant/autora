@@ -78,7 +78,7 @@ export const CarsList = () => {
 
   useEffect(() => {
     fetchCars(search);
-  }, [search]);
+  }, [fetchCars,search]);
 
 
   useEffect(() => {
@@ -96,7 +96,7 @@ export const CarsList = () => {
       toast.success("Car updated successfully");
       fetchCars(search);
     }
-  }, [deleteResult, updateResult, search]);
+  }, [fetchCars,deleteResult, updateResult, search]);
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

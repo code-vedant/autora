@@ -86,7 +86,7 @@ function EmiCalculator({ price = 600000 }) {
 
   useEffect(() => {
     calculateLoan(loanAmount, downPayment, interestRate, loanTenure);
-  }, []);
+  }, [calculateLoan, loanAmount, downPayment, interestRate, loanTenure]);
 
   const formatNumber = (num: string | number): string => {
     return new Intl.NumberFormat("en-IN").format(Number(num));

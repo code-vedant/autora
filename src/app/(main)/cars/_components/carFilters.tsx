@@ -117,6 +117,7 @@ export const CarFilters = ({ filters }: CarFiltersProps) => {
     router.push(url);
     setIsSheetOpen(false);
   }, [
+    router,
     brand,
     bodyType,
     fuelType,
