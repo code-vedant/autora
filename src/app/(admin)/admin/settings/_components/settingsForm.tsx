@@ -217,7 +217,7 @@ export const SettingsForm = () => {
 
   // Filter users by search term
   const filteredUsers = useMemo(() => {
-    if (!usersData?.success) return [];
+    if (!usersData?.success || !Array.isArray(usersData.data)) return [];
     return usersData.data
       .map(user => ({
         ...user,
