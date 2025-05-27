@@ -50,6 +50,7 @@ import {
   updateUserRole,
 } from "@/actions/settings";
 import { User } from "@/generated/prisma";
+import Image from "next/image";
 
 
 // Day names for display
@@ -251,7 +252,7 @@ export const SettingsForm = () => {
             <CardHeader>
               <CardTitle>Working Hours</CardTitle>
               <CardDescription>
-                Set your dealership's working hours for each day of the week.
+                Set your dealership&apos; working hours for each day of the week.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -390,8 +391,10 @@ export const SettingsForm = () => {
                             <div className="flex items-center gap-2">
                               <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                                 {user.imageUrl ? (
-                                  <img
+                                  <Image
                                     src={user.imageUrl}
+                                    width={512}
+                    height={512}
                                     alt={user.name || "User"}
                                     className="w-full h-full object-cover"
                                   />

@@ -81,7 +81,8 @@ export default async function Home() {
                       brand.image || `/brand/${brand.name.toLowerCase()}.webp`
                     }
                     alt={brand.name}
-                    fill
+                                  width={512}
+              height={288}
                     style={{ objectFit: "contain" }}
                   />
                 </div>
@@ -156,7 +157,8 @@ export default async function Home() {
                      type?.image || `/body/${type.name.toLowerCase()}.webp`
                     }
                     alt={type.name}
-                    fill
+                                  width={512}
+              height={288}
                     className="object-cover group-hover:scale-105 transition duration-300"
                   />
                 </div>

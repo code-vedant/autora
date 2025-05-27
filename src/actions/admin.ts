@@ -46,15 +46,15 @@ export async function getAdminTestDrives({
       NOT?: { status?: { in: BookingStatus[] } };
       OR?: Array<{
         car?: {
-          OR: Array<{ brand?: any; model?: any }>;
+          OR: Array<{ brand?: { contains: string; mode: "insensitive" }; model?: { contains: string; mode: "insensitive" } }>;
         };
         user?: {
-          OR: Array<{ name?: any; email?: any }>;
+          OR: Array<{ name?: { contains: string; mode: "insensitive" }; email?: { contains: string; mode: "insensitive" } }>;
         };
       }>;
     };
 
-    let where: whereType = {};
+    const where: whereType = {};
 
 if (status && status !== "ALL") {
   where.status = status as BookingStatus;
@@ -109,7 +109,32 @@ if (status && status !== "ALL") {
       orderBy: [{ bookingDate: "desc" }, { startTime: "asc" }],
     });
 
-    const serializedBookings = bookings.map((booking: any) => ({
+    type bookingType = {
+      id: string;
+      createdAt: Date; 
+      updatedAt: Date; 
+      userId: string; 
+      carId: string; 
+      bookingDate: Date; 
+      startTime: string; 
+      endTime: string; 
+      status: BookingStatus; 
+      notes: string | null; 
+      car: {
+        id: string;
+        model: string;
+      };
+      user: {
+        id: string;
+        name: string | null;
+        email: string;
+        imageUrl: string | null;
+        phone: string | null;
+      };
+    };
+    
+
+    const serializedBookings = bookings.map((booking: bookingType) => ({
       id: booking.id,
       carId: booking.carId,
       car: serializeCarData(booking.car),
@@ -138,7 +163,7 @@ if (status && status !== "ALL") {
 }
 
 
-function isValidBookingStatus(value: any): value is BookingStatus {
+function isValidBookingStatus(value : BookingStatus): value is BookingStatus {
   return Object.values(BookingStatus).includes(value);
 }
 

@@ -5,10 +5,24 @@ import { db } from "@/lib/prisma";
 import aj from "../lib/arcjet";
 import { request } from "@arcjet/next";
 import { Car } from "@/generated/prisma";
+import { getErrorMessage } from "@/lib/errors";
 
 interface SerializedCar {
-  [key: string]: any;
+  id: string;
+  brand: string;
+  model: string;
+  year: number;
+  color: string;
   price: number;
+  mileage: string;
+  seats: string;
+  bodyType: string;
+  fuelType: string;
+  transmission: string;
+  description: string;
+  status: string;
+  featured: boolean;
+  images: string[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -16,14 +30,27 @@ interface SerializedCar {
 // Function to serialize car data
 function serializeCarData(car: Car): SerializedCar {
   return {
-    ...car,
+    id: car.id,
+    brand: car.brand,
+    model: car.model,
+    year: car.year,
+    color: car.color,
     price: car.price ? parseFloat(car.price.toString()) : 0,
+    mileage: car.mileage,
+    seats: car.seats ? car.seats.toString() : "N/A",
+    bodyType: car.bodyType,
+    fuelType: car.fuelType,
+    transmission: car.transmission,
+    description: car.description,
+    status: car.status,
+    featured: car.featured,
+    images: car.images || [],
     createdAt: car.createdAt?.toISOString(),
     updatedAt: car.updatedAt?.toISOString(),
   };
 }
 
-interface FeaturedCarsResult extends Array<SerializedCar> {}
+type FeaturedCarsResult = SerializedCar[];
 
 /**
  * Get featured cars for the homepage
@@ -40,8 +67,8 @@ export async function getFeaturedCars(limit: number = 3): Promise<FeaturedCarsRe
     });
 
     return cars.map(serializeCarData);
-  } catch (error: any) {
-    throw new Error("Error fetching featured cars:" + error.message);
+  } catch (error) {
+    throw new Error("Error fetching featured cars: " + getErrorMessage(error));
   }
 }
 
@@ -52,14 +79,24 @@ async function fileToBase64(file: File): Promise<string> {
   return buffer.toString("base64");
 }
 
+interface CarDetails {
+  brand: string;
+  model: string;
+  year: number;
+  color: string;
+  price: string;
+  mileage: string;
+  seats: string;
+  bodyType: string;
+  fuelType: string;
+  transmission: string;
+  description: string;
+  confidence: number;
+}
+
 interface ImageSearchResultSuccess {
   success: true;
-  data: {
-    brand: string;
-    bodyType: string;
-    color: string;
-    confidence: number;
-  };
+  data: CarDetails;
 }
 
 interface ImageSearchResultFailure {
@@ -171,7 +208,7 @@ export async function processImageSearch(file: File): Promise<ImageSearchResult>
 
     // Parse the JSON response
     try {
-      const carDetails = JSON.parse(cleanedText);
+      const carDetails = JSON.parse(cleanedText) as CarDetails;
 
       // Return success response with data
       return {
@@ -185,11 +222,11 @@ export async function processImageSearch(file: File): Promise<ImageSearchResult>
         error: "Failed to parse AI response",
       };
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error("AI Search error:", error);
     return {
       success: false,
-      error: "AI Search error:" + error.message,
+      error: "AI Search error: " + getErrorMessage(error),
     };
   }
 }

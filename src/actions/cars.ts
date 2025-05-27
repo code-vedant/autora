@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase";
 import { auth } from "@clerk/nextjs/server";
 import { serializeCarData } from "@/lib/helper";
 import { Car, CarStatus } from "@/generated/prisma";
+import { getErrorMessage } from "@/lib/errors";
 
 export async function processImagewithAI(file: File) {
   try {
@@ -99,8 +100,12 @@ export async function processImagewithAI(file: File) {
       };
     }
   } catch (error) {
-    console.error();
-    throw new Error("Gemini API error: " + error);
+    console.error("Error processing image with AI:", error);
+    return {
+      success: false,
+      error: "Error processing image with AI: " + getErrorMessage(error),
+    };
+    
   }
 }
 
@@ -192,12 +197,13 @@ export async function addCar({
     revalidatePath("/admin/cars");
 
     return { success: true };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      throw new Error("Error adding car: " + error.message);
+  } catch (error) {
+      console.error("Error adding car details:", error);
+      return {
+        success: false,
+        error: "Error adding car details: " + getErrorMessage(error),
+      };
     }
-    throw new Error("Unknown error adding car");
-  }
 }
 
 export async function getCars(search = "") {
@@ -253,7 +259,10 @@ export async function getCars(search = "") {
     };
   } catch (error) {
     console.error("Error fetching cars:", error);
-    throw new Error("Failed to fetch cars");
+    return { 
+      success : false,
+      error: "Error fetching cars: " + getErrorMessage(error)
+    }
   }
 }
 
@@ -312,7 +321,7 @@ export async function deleteCar(id: string) {
     console.error("Error deleting car:", error);
     return {
       success: false,
-      error: error,
+      error: "Error deleting car: " + getErrorMessage(error),
     };
   }
 }
@@ -352,7 +361,7 @@ export async function updateCarStatus(id : string, { status, featured } : { stat
     console.error("Error updating car status:", error);
     return {
       success: false,
-      error: error,
+      error: "Error updating car status" + getErrorMessage(error),
     };
   }
 }

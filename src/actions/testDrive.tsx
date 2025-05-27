@@ -5,6 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
 import { serializeCarData } from "@/lib/helper";
 import { BookingStatus, Car, TestDriveBooking } from "@/generated/prisma";
+import { getErrorMessage } from "@/lib/errors";
 
 
 interface BookingResult {
@@ -113,11 +114,11 @@ export async function bookTestDrive({
       success: true,
       data: booking,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error booking test drive:", error);
     return {
       success: false,
-      error: error.message || "Failed to book test drive",
+      error:"Failed to book test drive" + getErrorMessage(error),
     };
   }
 }
@@ -176,11 +177,11 @@ export async function getUserTestDrives(): Promise<UserTestDrivesResult> {
       success: true,
       data: formattedBookings,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching test drives:", error);
     return {
       success: false,
-      error: error.message,
+      error: "Failed to fetch test drives: " + getErrorMessage(error),
     };
   }
 }
@@ -259,11 +260,11 @@ export async function cancelTestDrive(bookingId: string): Promise<CancelBookingR
       success: true,
       message: "Test drive cancelled successfully",
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error cancelling test drive:", error);
     return {
       success: false,
-      error: error.message,
+      error: "Failed to cancel test drive: " + getErrorMessage(error),
     };
   }
 }

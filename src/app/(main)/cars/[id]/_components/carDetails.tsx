@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@clerk/nextjs";
-import {  Calendar } from "lucide-react";
+import { Calendar } from "lucide-react";
 import {
   Car,
   Fuel,
@@ -58,8 +58,6 @@ type CarDetailsProps = {
   status: string;
   images: string[];
 };
-
-
 
 export function CarDetails({
   car,
@@ -152,9 +150,9 @@ export function CarDetails({
               <Image
                 src={car.images[currentImageIndex]}
                 alt={`${car.year} ${car.brand} ${car.model}`}
-                fill
+                width={1080}
+                height={1080}
                 className="object-cover"
-                priority
               />
             ) : (
               <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -181,7 +179,8 @@ export function CarDetails({
                     alt={`${car.year} ${car.brand} ${car.model} - view ${
                       index + 1
                     }`}
-                    fill
+                    width={512}
+                    height={288}
                     className="object-cover"
                   />
                 </div>
@@ -437,7 +436,7 @@ export function CarDetails({
               <div className="space-y-2">
                 {testDriveInfo.dealership?.workingHours
                   ? testDriveInfo.dealership.workingHours
-                      .sort(( a: DaySchedule, b: DaySchedule ) => {
+                      .sort((a: DaySchedule, b: DaySchedule) => {
                         const days = [
                           "MONDAY",
                           "TUESDAY",

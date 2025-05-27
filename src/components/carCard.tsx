@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import useFetch from "@/hooks/use-fetch";
 import { formatCurrency } from "@/lib/helper";
 
-export const CarCard = ({ car}:{car: any}) => {
+export const CarCard = ({ car }: { car: any }) => {
   const { isSignedIn } = useAuth();
   const router = useRouter();
   const [isSaved, setIsSaved] = useState(car.wishlisted);
@@ -42,7 +42,7 @@ export const CarCard = ({ car}:{car: any}) => {
   }, [toggleError]);
 
   // Handle save/unsave car
-  const handleToggleSave = async (e : any) => {
+  const handleToggleSave = async (e: any) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -66,8 +66,9 @@ export const CarCard = ({ car}:{car: any}) => {
             <Image
               src={car.images[0]}
               alt={`${car.brand} ${car.model}`}
-              fill
-              className="object-cover group-hover:scale-105 transition duration-300"
+              width={512}
+              height={512}
+              className="object-cover w-full h-full group-hover:scale-105 transition duration-300"
             />
           </div>
         ) : (
@@ -101,7 +102,7 @@ export const CarCard = ({ car}:{car: any}) => {
             {car.brand} {car.model}
           </h3>
           <span className="text-xl font-bold text-blue-600">
-           {formatCurrency(car.price)}
+            {formatCurrency(car.price)}
           </span>
         </div>
 

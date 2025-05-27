@@ -1,6 +1,7 @@
 "use server";
 
-import { DealershipInfo, Prisma, WorkingHour } from "@/generated/prisma";
+import {  Prisma } from "@/generated/prisma";
+import { getErrorMessage } from "@/lib/errors";
 import { serializeCarData } from "@/lib/helper";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
@@ -43,8 +44,6 @@ interface GetCarsParams {
   page?: number;
   limit?: number;
 }
-
-
 
 export async function getCarFilters(): Promise<CarFiltersResult> {
   try {
@@ -104,9 +103,9 @@ export async function getCarFilters(): Promise<CarFiltersResult> {
         },
       },
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching car filters:", error);
-    throw new Error("Error fetching car filters:" + error.message);
+    throw new Error("Error fetching car filters: " + getErrorMessage(error));
   }
 }
 
@@ -133,7 +132,7 @@ export async function getCars({
     }
 
     // Build where conditions
-    let where: Prisma.CarWhereInput= {
+    const where: Prisma.CarWhereInput = {
       status: "AVAILABLE",
     };
 
@@ -164,7 +163,7 @@ export async function getCars({
     const skip = (page - 1) * limit;
 
     // Determine sort order
-    let orderBy = {};
+    let orderBy: Prisma.CarOrderByWithRelationInput = {};
     switch (sortBy) {
       case "priceAsc":
         orderBy = { price: "asc" };
@@ -215,9 +214,9 @@ export async function getCars({
         pages: Math.ceil(totalCars / limit),
       },
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching cars:", error);
-    throw new Error("Error fetching cars: " + error.message);
+    throw new Error("Error fetching cars: " + getErrorMessage(error));
   }
 }
 
@@ -303,30 +302,48 @@ export async function toggleSavedCar(carId: string): Promise<ToggleSavedCarResul
       saved: true,
       message: "Car added to favorites",
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error toggling saved car:", error);
-    throw new Error("Error toggling saved car: " + error.message);
+    throw new Error("Error toggling saved car: " + getErrorMessage(error));
   }
+}
+
+interface SerializedWorkingHour {
+  id: string;
+  day: string;
+  openTime: string;
+  closeTime: string;
+  isOpen: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface SerializedDealership {
+  id: string;
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+  latitude: number;
+  longitude: number;
+  createdAt: string;
+  updatedAt: string;
+  workingHours: SerializedWorkingHour[];
+}
+
+interface TestDriveInfo {
+  userTestDrive: {
+    id: string;
+    status: string;
+    bookingDate: string;
+  } | null;
+  dealership: SerializedDealership | null;
 }
 
 interface CarDetailsResultSuccess {
   success: true;
   data: ReturnType<typeof serializeCarData> & {
-    testDriveInfo: {
-      userTestDrive: {
-        id: string;
-        status: string;
-        bookingDate: string;
-      } | null;
-      dealership: (DealershipInfo & {
-        createdAt: string;
-        updatedAt: string;
-        workingHours: (WorkingHour & {
-          createdAt: string;
-          updatedAt: string;
-        })[];
-      }) | null;
-    };
+    testDriveInfo: TestDriveInfo;
   };
 }
 
@@ -429,11 +446,11 @@ export async function getCarById(carId: string): Promise<CarDetailsResult> {
         },
       },
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching car details:", error);
     return {
       success: false,
-      error: "Error fetching car details: " + error.message,
+      error: "Error fetching car details: " + getErrorMessage(error),
     };
   }
 }
@@ -485,17 +502,17 @@ export async function getSavedCars(): Promise<GetSavedCarsResult> {
     });
 
     // Extract and format car data
-    const cars = savedCars.map((saved) => serializeCarData(saved.car,true));
+    const cars = savedCars.map((saved) => serializeCarData(saved.car, true));
 
     return {
       success: true,
       data: cars,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching saved cars:", error);
     return {
       success: false,
-      error: error.message,
+      error: getErrorMessage(error),
     };
   }
 }

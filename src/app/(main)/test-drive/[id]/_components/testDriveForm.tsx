@@ -41,6 +41,7 @@ import { toast } from "sonner";
 import useFetch from "@/hooks/use-fetch";
 import { Car as CarType, TestDriveBooking } from "@/generated/prisma";
 import { formatCurrency } from "@/lib/helper";
+import Image from "next/image";
 
 // Define interfaces for better type safety
 interface TimeSlot {
@@ -277,8 +278,10 @@ export function TestDriveForm({ car, testDriveInfo }: TestDriveFormProps) {
 
             <div className="aspect-video rounded-lg overflow-hidden relative mb-4">
               {car.images && car.images.length > 0 ? (
-                <img
+                <Image
                   src={car.images[0]}
+                  width={512}
+                    height={512}
                   alt={`${car.year} ${car.brand} ${car.model}`}
                   className="object-cover w-full h-full"
                 />
@@ -487,7 +490,7 @@ export function TestDriveForm({ car, testDriveInfo }: TestDriveFormProps) {
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-start">
                   <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
-                  Bring your driver's license for verification
+                  Bring your driver&apos;s license for verification
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
@@ -540,7 +543,7 @@ export function TestDriveForm({ car, testDriveInfo }: TestDriveFormProps) {
               </div>
 
               <div className="mt-4 bg-blue-50 p-3 rounded text-sm text-blue-700">
-                Please arrive 10 minutes early with your driver's license.
+                Please arrive 10 minutes early with your driver&apos;s license.
               </div>
             </div>
           )}

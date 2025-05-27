@@ -688,8 +688,10 @@ export const AddCarForm = () => {
                                 <div className="border-2 border-dashed rounded-lg p-6 text-center">
                                     {imagePreview ? (
                                         <div className="flex flex-col items-center">
-                                            <img
+                                            <Image
                                                 src={imagePreview}
+                                                width={512}
+                    height={512}
                                                 alt="Car preview"
                                                 className="max-h-56 max-w-full object-contain mb-4"
                                             />

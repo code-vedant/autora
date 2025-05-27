@@ -9,6 +9,7 @@ import { useDropzone } from "react-dropzone";
 import { useRouter } from "next/navigation";
 import { processImageSearch } from "@/actions/home";
 import useFetch from "@/hooks/use-fetch";
+import Image from "next/image";
 
 export function HomeSearch() {
   const router = useRouter();
@@ -147,8 +148,10 @@ export function HomeSearch() {
             <div className="border-2 border-dashed border-gray-300 rounded-3xl p-6 text-center">
               {imagePreview ? (
                 <div className="flex flex-col items-center">
-                  <img
+                  <Image
                     src={imagePreview}
+                    width={512}
+                    height={512}
                     alt="Car preview"
                     className="h-40 object-contain mb-4"
                   />

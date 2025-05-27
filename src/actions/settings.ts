@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { User, WorkingHour } from "@/generated/prisma";
+import { getErrorMessage } from "@/lib/errors";
 
 // Get dealership info with working hours
 export async function getDealershipInfo() {
@@ -94,8 +95,12 @@ export async function getDealershipInfo() {
       },
     };
   } catch (error) {
-    throw new Error("Error fetching dealership info");
-  }
+   console.error("Error fetching dealership info");
+   return {
+      success: false,
+      error: "Error fetching dealership info" + getErrorMessage(error),
+    };
+   }
 }
 
 // Save working hours
@@ -147,7 +152,10 @@ export async function saveWorkingHours(workingHours : WorkingHour[]) {
     };
   } catch (error) {
     console.error("Error saving working hours:", error);
-    throw new Error("Error saving working hours");
+    return {
+      success: false,
+      error: "Error saving working hours: " + getErrorMessage(error),
+    };
   }
 }
 
@@ -181,7 +189,10 @@ export async function getUsers() {
     };
   } catch (error) {
     console.error("Error fetching users:", error);
-    throw new Error("Error fetching users:");
+    return {
+      success: false,
+      error: "Error fetching users: " + getErrorMessage(error),
+    };
   }
 }
 
@@ -206,8 +217,6 @@ export async function updateUserRole(id: string, role: User["role"]) {
       throw new Error("Unauthorized: Admin access required");
     }
 
-    console.log("Updating user role:", { id, role });
-
     // Update user role
     await db.user.update({
       where: { id: id },
@@ -217,8 +226,11 @@ export async function updateUserRole(id: string, role: User["role"]) {
     revalidatePath("/admin/settings");
 
     return { success: true };
-  } catch (error: any) {
-    console.error("Error updating user role:", error?.message || error);
-    throw new Error(error?.message || "Error updating user role");
+  } catch (error) {
+    console.error("Error updating user role:",error);
+    return {
+      success: false,
+      error: "Error updating user role: " + getErrorMessage(error),
+    };
   }
 }
