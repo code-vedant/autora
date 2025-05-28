@@ -13,7 +13,7 @@ export default async function CarsPage() {
   const filtersData = await getCarFilters();
 
   return (
-    <div className="container mx-auto px-4">
+    <div className="container mx-auto px-4 md:py-4 py-8">
       <h1 className="text-6xl mb-4 gradient-title">Browse Cars</h1>
 
       <div className="flex flex-col lg:flex-row gap-8">
@@ -21,7 +21,6 @@ export default async function CarsPage() {
         <div className="w-full lg:w-80 flex-shrink-0">
           <CarFilters filters={filtersData.data} />
         </div>
-
         {/* Car Listings */}
         <div className="flex-1">
           <CarListings />

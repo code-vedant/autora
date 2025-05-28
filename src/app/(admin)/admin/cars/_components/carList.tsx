@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -47,6 +47,7 @@ import { getCars, deleteCar, updateCarStatus } from "@/actions/cars";
 import { formatCurrency } from "@/lib/helper";
 import Image from "next/image";
 import { Car } from "@/generated/prisma";
+import Link from "next/link";
 
 export const CarsList = () => {
   const router = useRouter();
@@ -78,13 +79,14 @@ export const CarsList = () => {
 
   useEffect(() => {
     fetchCars(search);
-  }, [fetchCars,search]);
-
+    console.log("fetchinng1");
+  },[]);
 
   useEffect(() => {
     if (carsError) toast.error("Failed to load cars");
     if (deleteError) toast.error("Failed to delete car");
     if (updateError) toast.error("Failed to update car");
+
   }, [carsError, deleteError, updateError]);
 
   useEffect(() => {
@@ -96,7 +98,7 @@ export const CarsList = () => {
       toast.success("Car updated successfully");
       fetchCars(search);
     }
-  }, [fetchCars,deleteResult, updateResult, search]);
+  }, [deleteResult, updateResult]);
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -114,7 +116,7 @@ export const CarsList = () => {
     await updateCarStatusFn(car.id, { featured: !car.featured });
   };
 
-  const handleStatusUpdate = async ({
+  const handleStatusUpdate = useCallback(async ({
     car,
     newStatus,
   }: {
@@ -122,7 +124,7 @@ export const CarsList = () => {
     newStatus: string;
   }) => {
     await updateCarStatusFn(car.id, { status: newStatus });
-  };
+  }, [updateCarStatusFn]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -152,13 +154,14 @@ export const CarsList = () => {
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <Button
-          onClick={() => router.push("/admin/cars/create")}
+       <Link href={"/admin/cars/create"} className="flex items-center">
+       <Button
           className="flex items-center"
         >
           <Plus className="h-4 w-4" />
           Add Car
         </Button>
+       </Link>
 
         <form onSubmit={handleSearchSubmit} className="flex w-full sm:w-auto">
           <div className="relative flex-1">

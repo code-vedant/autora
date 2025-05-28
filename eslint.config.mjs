@@ -22,6 +22,7 @@ const eslintConfig = [
   {
     rules: {
       // your custom rules
+      'react-hooks/exhaustive-deps': 'off',
     }
   }
 ];

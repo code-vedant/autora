@@ -202,7 +202,7 @@ export const SettingsForm = () => {
 
   // Make user admin
   const handleMakeAdmin = async () => {
-    // if (!userToPromote) return;
+    if (!userToPromote) return;
 
     console.log("Promoting user to admin:", userToPromote?.id);
     

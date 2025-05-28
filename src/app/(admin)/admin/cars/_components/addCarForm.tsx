@@ -257,6 +257,7 @@ export const AddCarForm = () => {
       setValue("fuelType", carDetails.fuelType);
       setValue("price", carDetails.price);
       setValue("mileage", carDetails.mileage);
+      setValue("seats", carDetails.seats ? carDetails.seats.toString() : "");
       setValue("transmission", carDetails.transmission);
       setValue("description", carDetails.description);
 
