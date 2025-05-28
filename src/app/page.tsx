@@ -21,10 +21,10 @@ export default async function Home() {
   return (
     <div className="flex flex-col mt-14">
       {/* Hero Section with Gradient Title */}
-      <section className="relative py-16 bg-gradient-to-tr from-black via-blue-900 to-black md:py-28">
+      <section className="gradient-flow relative py-16  md:py-28">
         <div className="max-w-4xl mx-auto text-center">
           <div className="mb-8">
-          <h1 className="text-5xl md:text-8xl mb-4 font-bold bg-gradient-to-br from-blue-600 via-fuchsia-700 to-cyan-200 bg-clip-text text-transparent gradient-title">
+          <h1 className="text-5xl md:text-8xl mb-4 font-bold bg-gradient-to-br from-cyan-400 to-blue-200 bg-clip-text text-transparent">
   Find your Dream Car with Autora AI
 </h1>
 
@@ -191,9 +191,9 @@ export default async function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-bl from-black to-blue-700 text-white">
+      <section className="py-16 gradientBottom text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4 bg-gradient-to-br from-cyan-200 via-fuchsia-300 to-rose-400 bg-clip-text text-transparent gradient-title">
+          <h2 className="text-3xl font-bold mb-4 bg-gradient-to-br from-cyan-400 to-blue-900 bg-clip-text text-transparent">
             Ready to Find Your Dream Car?
           </h2>
           <p className="text-xl text-white/70 mb-8 max-w-2xl mx-auto">

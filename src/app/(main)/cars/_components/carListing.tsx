@@ -56,8 +56,6 @@ export function CarListings() {
       limit,
     });
   }, [
-    fetchCars,
-    search,
     brand,
     bodyType,
     fuelType,

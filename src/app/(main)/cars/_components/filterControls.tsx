@@ -77,7 +77,7 @@ export const CarFilterControls = ({
       {/* Price Range */}
       <div className="space-y-4">
         <h3 className="font-medium">Price Range</h3>
-        <div className="px-2">
+        <div className="mx-1 w-full">
           <Slider
             min={filters.priceRange.min}
             max={filters.priceRange.max}

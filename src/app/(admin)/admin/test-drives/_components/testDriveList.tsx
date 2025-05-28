@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { Search, Loader2, CalendarRange, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,14 +25,19 @@ import useFetch from "@/hooks/use-fetch";
 import { getAdminTestDrives, updateTestDriveStatus } from "@/actions/admin";
 import { cancelTestDrive } from "@/actions/testDrive";
 
-
-
-
-
 export const TestDrivesList = () => {
-
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // Custom hooks for API calls
   const {
@@ -56,12 +61,23 @@ export const TestDrivesList = () => {
     error: cancelError,
   } = useFetch(cancelTestDrive);
 
-  // Initial fetch and refetch on search/filter changes
-  useEffect(() => {
-    fetchTestDrives({ search, status: statusFilter });
-  }, [fetchTestDrives,search, statusFilter]);
+  // Memoized fetch parameters
+  const fetchParams = useMemo(() => ({
+    search: debouncedSearch,
+    status: statusFilter
+  }), [debouncedSearch, statusFilter]);
 
-  // Handle errors
+  // Stable fetch function with useCallback
+  const stableFetchTestDrives = useCallback(() => {
+    fetchTestDrives(fetchParams);
+  }, [fetchTestDrives, fetchParams]);
+
+  // Initial fetch and refetch on parameter changes
+  useEffect(() => {
+    stableFetchTestDrives();
+  }, [stableFetchTestDrives]);
+
+  // Error handling with single effect
   useEffect(() => {
     if (testDrivesError) {
       toast.error("Failed to load test drives");
@@ -74,35 +90,81 @@ export const TestDrivesList = () => {
     }
   }, [testDrivesError, updateError, cancelError]);
 
-  // Handle successful operations
+  // Success handling with single effect
   useEffect(() => {
-    if (updateResult?.success) {
-      toast.success("Test drive status updated successfully");
-      fetchTestDrives({ search, status: statusFilter });
+    if (updateResult?.success || cancelResult?.success) {
+      const message = updateResult?.success 
+        ? "Test drive status updated successfully"
+        : "Test drive cancelled successfully";
+      toast.success(message);
+      stableFetchTestDrives();
     }
-    if (cancelResult?.success) {
-      toast.success("Test drive cancelled successfully");
-      fetchTestDrives({ search, status: statusFilter });
-    }
-  }, [fetchTestDrives,search,statusFilter,updateResult, cancelResult]);
+  }, [updateResult?.success, cancelResult?.success, stableFetchTestDrives]);
 
-  // Handle search submit
-  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // Handle search submit (force immediate search)
+  const handleSearchSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    fetchTestDrives({ search, status: statusFilter });
-  };
+    // Force immediate search by updating debounced search
+    setDebouncedSearch(search);
+  }, [search]);
 
-  // Handle status update
-  const handleUpdateStatus = async (bookingId : string, newStatus : string) => {
-    if (newStatus) {
+  // Handle status update with useCallback
+  const handleUpdateStatus = useCallback(async (bookingId: string, newStatus: string) => {
+    if (newStatus && !updatingStatus) {
       await updateStatusFn(bookingId, newStatus);
     }
-  };
+  }, [updateStatusFn, updatingStatus]);
 
-  // Handle booking cancellation
-  const handleCancel = async (bookingId : string) => {
-    await cancelTestDriveFn(bookingId);
-  };
+  // Handle booking cancellation with useCallback
+  const handleCancel = useCallback(async (bookingId: string) => {
+    if (!cancelling) {
+      await cancelTestDriveFn(bookingId);
+    }
+  }, [cancelTestDriveFn, cancelling]);
+
+  // Memoized empty state message
+  const emptyStateMessage = useMemo(() => {
+    if (statusFilter !== "ALL" || debouncedSearch) {
+      return "No test drives match your search criteria";
+    }
+    return "There are no test drive bookings yet.";
+  }, [statusFilter, debouncedSearch]);
+
+  // Memoized test drives list
+  const testDrivesList = useMemo(() => {
+    if (!testDrivesData?.data) return null;
+
+    return testDrivesData.data.map((booking) => (
+      <div key={booking.id} className="relative">
+        <TestDriveCard
+          booking={booking}
+          onCancel={handleCancel}
+          showActions={["PENDING", "CONFIRMED"].includes(booking.status)}
+          isAdmin={true}
+          isCancelling={!!cancelling}
+          cancelError={!!cancelError}
+          renderStatusSelector={() => (
+            <Select
+              value={booking.status}
+              onValueChange={(value) => handleUpdateStatus(booking.id, value)}
+              disabled={!!updatingStatus}
+            >
+              <SelectTrigger className="w-full h-8">
+                <SelectValue placeholder="Update Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="CONFIRMED">Confirmed</SelectItem>
+                <SelectItem value="COMPLETED">Completed</SelectItem>
+                <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                <SelectItem value="NO_SHOW">No Show</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        />
+      </div>
+    ));
+  }, [testDrivesData?.data, handleCancel, handleUpdateStatus, cancelling, cancelError, updatingStatus]);
 
   return (
     <div className="space-y-4">
@@ -110,10 +172,7 @@ export const TestDrivesList = () => {
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-4 w-full">
           {/* Status Filter */}
-          <Select
-            value={statusFilter}
-            onValueChange={setStatusFilter}
-          >
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger>
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
@@ -177,49 +236,10 @@ export const TestDrivesList = () => {
               <h3 className="text-lg font-medium text-gray-900 mb-1">
                 No test drives found
               </h3>
-              <p className="text-gray-500 mb-4">
-                {statusFilter || search
-                  ? "No test drives match your search criteria"
-                  : "There are no test drive bookings yet."}
-              </p>
+              <p className="text-gray-500 mb-4">{emptyStateMessage}</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {testDrivesData?.data?.map((booking) => (
-                <div key={booking.id} className="relative">
-                  <TestDriveCard
-                    booking={booking}
-                    onCancel={handleCancel}
-                    showActions={["PENDING", "CONFIRMED"].includes(
-                      booking.status
-                    )}
-                    isAdmin={true}
-                    isCancelling={!!cancelling}
-                    cancelError={!!cancelError}
-                    renderStatusSelector={() => (
-                      <Select
-                        value={booking.status}
-                        onValueChange={(value) =>
-                          handleUpdateStatus(booking.id, value)
-                        }
-                        disabled={!!updatingStatus}
-                      >
-                        <SelectTrigger className="w-full h-8">
-                          <SelectValue placeholder="Update Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="PENDING">Pending</SelectItem>
-                          <SelectItem value="CONFIRMED">Confirmed</SelectItem>
-                          <SelectItem value="COMPLETED">Completed</SelectItem>
-                          <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                          <SelectItem value="NO_SHOW">No Show</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
-              ))}
-            </div>
+            <div className="space-y-4">{testDrivesList}</div>
           )}
         </CardContent>
       </Card>

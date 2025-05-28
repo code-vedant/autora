@@ -167,13 +167,13 @@ function isValidBookingStatus(value : BookingStatus): value is BookingStatus {
   return Object.values(BookingStatus).includes(value);
 }
 
-export async function updateTestDriveStatus({
-  bookingId,
-  newStatus,
-}: {
-  bookingId: string;
-  newStatus: BookingStatus;
-}) {
+export async function updateTestDriveStatus(bookingId: string, newStatus: BookingStatus) {
+  if (!bookingId || !newStatus) {
+    return {
+      success: false,
+      message: "Booking ID and new status are required",
+    };
+  }
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
@@ -185,6 +185,8 @@ export async function updateTestDriveStatus({
     if (!user || user.role !== "ADMIN") {
       throw new Error("Unauthorized access");
     }
+
+    
 
     if (!isValidBookingStatus(newStatus)) {
       throw new Error("Invalid booking status");

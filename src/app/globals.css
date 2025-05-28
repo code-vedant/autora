@@ -119,3 +119,44 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 0%;
+}
+25% {
+    background-position: 100% 25%;
+}
+50% {
+    background-position: 200% 50%;
+}
+75% {
+    background-position: 300% 75%;
+}
+100% {
+    background-position: 400% 120%;
+}
+}
+
+.gradient-flow {
+  background: linear-gradient(60deg, 
+     #000000, #0f09bb, #000000);
+  background-size: 200% 100%;
+  animation: gradientMove 10s linear infinite;
+}
+
+@keyframes blueFire {
+  0%, 100% {
+    background-position: bottom 100%;
+  }
+  50% {
+    background-position: center 0%;
+  }
+}
+
+.gradientBottom {
+  background: linear-gradient(to top, #000, #0f09bb, #f9fafb);
+  background-size: 100% 200%;
+  background-repeat: no-repeat;
+  animation: blueFire 20s ease-in-out infinite;
+}

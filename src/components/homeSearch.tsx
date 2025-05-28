@@ -120,11 +120,11 @@ export function HomeSearch() {
             placeholder="Enter brand, model, or use our AI Image Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-12 py-6 w-full rounded-full border-gray-300 bg-white/95 backdrop-blur-sm"
+            className="pl-2 md:pl-10 pr-12 py-6 w-full mx-2 md:mx-0 rounded-full placeholder:text-xs md:placeholder:text-lg border-gray-300 bg-white/95 backdrop-blur-sm"
           />
 
           {/* Image Search Button */}
-          <div className="absolute right-[100px]">
+          <div className="absolute right-16 md:right-28">
             <Camera
               size={35}
               onClick={() => setIsImageSearchActive(!isImageSearchActive)}
@@ -136,8 +136,11 @@ export function HomeSearch() {
             />
           </div>
 
-          <Button type="submit" className="absolute right-2 rounded-full">
+          <Button type="submit" className="absolute right-4 md:right-2 rounded-full">
+          <Search className="md:hidden w-5 h-5 "/>
+            <span className="hidden md:inline-flex">
             Search
+            </span>
           </Button>
         </div>
       </form>
