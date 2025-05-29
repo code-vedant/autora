@@ -46,7 +46,7 @@ export const featuredCars = [
   export const carBrands = [
     { id: 1, name: "Hyundai", image: "/brand/hyundai.webp" },
     { id: 2, name: "Honda", image: "/brand/honda.webp" },
-    { id: 3, name: "BMW", image: "/brand/bmw.webp" },
+    { id: 3, name: "Kia", image: "/brand/kia.webp" },
     { id: 4, name: "Tata", image: "/brand/tata.webp" },
     { id: 5, name: "Mahindra", image: "/brand/mahindra.webp" },
     { id: 6, name: "Ford", image: "/brand/ford.webp" },

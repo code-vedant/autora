@@ -24,9 +24,9 @@ export default async function Home() {
       <section className="gradient-flow relative py-16  md:py-28">
         <div className="max-w-4xl mx-auto text-center">
           <div className="mb-8">
-          <h1 className="text-5xl md:text-8xl mb-4 font-bold bg-gradient-to-br from-cyan-400 to-blue-200 bg-clip-text text-transparent">
-  Find your Dream Car with Autora AI
-</h1>
+            <h1 className="text-5xl md:text-8xl mb-4 font-bold bg-gradient-to-br from-cyan-400 to-blue-200 bg-clip-text text-transparent">
+              Find your Dream Car with Autora AI
+            </h1>
 
             <p className="text-xl mb-8 text-white/80 max-w-2xl mx-auto">
               Advanced AI Car Search and test drive from thousands of Cars.
@@ -73,7 +73,7 @@ export default async function Home() {
               <Link
                 key={brand.name}
                 href={`/cars?brand=${brand.name}`}
-                className="bg-white rounded-lg shadow p-4 text-center hover:shadow-md transition cursor-pointer"
+                className="bg-white rounded-lg shadow p-4 text-center h-32 hover:shadow-md transition cursor-pointer"
               >
                 <div className="h-16 w-auto mx-auto mb-2 relative">
                   <Image
@@ -81,12 +81,11 @@ export default async function Home() {
                       brand.image || `/brand/${brand.name.toLowerCase()}.webp`
                     }
                     alt={brand.name}
-                                  width={512}
-              height={288}
+                    width={512}
+                    height={288}
                     style={{ objectFit: "contain" }}
                   />
                 </div>
-                <h3 className="font-medium">{brand.name}</h3>
               </Link>
             ))}
           </div>
@@ -153,12 +152,10 @@ export default async function Home() {
               >
                 <div className="overflow-hidden rounded-lg flex justify-end h-28 mb-4 relative">
                   <Image
-                    src={
-                     type?.image || `/body/${type.name.toLowerCase()}.webp`
-                    }
+                    src={type?.image || `/body/${type.name.toLowerCase()}.webp`}
                     alt={type.name}
-                                  width={512}
-              height={288}
+                    width={512}
+                    height={288}
                     className="object-cover group-hover:scale-105 transition duration-300"
                   />
                 </div>
